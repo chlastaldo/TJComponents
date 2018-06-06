@@ -6,12 +6,19 @@
 		<script type="text/javascript" src="UIForm.js"></script>
 	</head>
 	<body>
+		<script>
+
+		</script>
 		<div id="respon">
 
 		</div>
 		<script>
-			let form = new UIForm( document.getElementById('respon') )
-			
+			let form = new UIForm( document.getElementById('respon'),
+			{
+				url		: '/send',
+				callback: ( respons ) => { console.log( respons ); }
+			} );
+				form.addElement( 'text', 'test', '', { label : 'jahode' } )
 		</script>
 	</body>
 </html>
