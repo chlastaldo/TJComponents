@@ -7,18 +7,22 @@
 	</head>
 	<body>
 		<script>
-
+			let theme =
+			{
+				text : [ '<div class="container"><label class="label"></label><input type="text" class="input"/></div>', '.container', '.input', '.label' ]
+			}
 		</script>
 		<div id="respon">
-
+			<UIForm name="test" id="test" type="text" value="" placeholder="placeholder">Makovicka</UIForm>
 		</div>
 		<script>
 			let form = new UIForm( document.getElementById('respon'),
 			{
+				theme 	: theme,
 				url		: '/send',
 				callback: ( respons ) => { console.log( respons ); }
 			} );
-				form.addElement( 'text', 'test', '', { label : 'jahode' } )
+			form.addElements()
 		</script>
 	</body>
 </html>

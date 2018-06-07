@@ -5,61 +5,70 @@ class UIForm
 		this._parentNode = parentNode;
 		this._options = options;
 		this._inputs = {};
+
+		this._nodes = this._parentNode.querySelectorAll('UIForm');
+
 	}
 
-	addElement( type, name, value = '', options )
+	addElements( )
 	{
-		if( type === 'text' )
+
+		this._nodes.forEach( ( node ) =>
 		{
-			this._inputs[ name ] = new UIFormText( this._parentNode, this._options, name, value = '', options );
-		}
+			if( node.getAttribute( 'type' ) === 'text' )
+			{
+				this._inputs[ name ] = new UIFormText( this._parentNode, this._options, node );
+			}
+		} )
 	}
 
+	__containerFocus()
+	{
+		console.log('__containerFocus', this);
+		//this._input.focus();
+	}
 	__focus()
 	{
-
+		console.log('__focus', this);
 	}
 
 	__blur()
 	{
-
-	}
-
-	__createElement( tag, classList = '', attributes = {}, html = '', events = {} )
-	{
-		if( typeof html === 'object' )
-		{
-			events = html, html = '';
-		}
-		let element = document.createElement( tag );
-			element.classList.add( classList );
-			for( let attribute in attributes )
-			{
-				element.setAttribute( attribute, attributes[ attribute ] );
-			}
-
-		if( html !== '' )
-		{
-			element.innerHTML = html;
-		}
-		return element;
+		console.log('__blur', this);
 	}
 }
 
 class UIFormText extends UIForm
 {
-	constructor( parentNode, parentOptions, name, value = '', options )
+	constructor( parentNode, parentOptions, node )
 	{
 		super( parentNode, parentOptions )
 
-		this._container = this.__createElement( 'div', 'container_input' );
-		this._input = this.__createElement( 'input', 'input', { name , value, id : name } );
-		this._label = this.__createElement( 'label', 'label', { for : name }, ( options.label ? options.label : '' ) );
-
-		this._container.appendChild( this._input );
-		this._container.appendChild( this._label )
-		parentNode.appendChild( this._container );
+		let [ html, container, input, label ] = this._options.theme.text;
+		let fragment = document.createElement('div');
+			fragment.innerHTML = html;
 
 
+		this._container = fragment.querySelector( container );
+		this._input = fragment.querySelector( input );
+		this._label = fragment.querySelector( label );
+
+		for( let i = 0; i < node.attributes.length; ++i )
+		{
+			this._input.setAttribute( node.attributes[i].name, node.attributes[i].value );
+			if( node.attributes[i].name == 'name' )
+			{
+				this._label.setAttribute( 'for', node.attributes[i].value );
+			}
+		}
+
+
+		this._label.innerHTML = node.innerHTML;
+
+		this._container.addEventListener( 'click', this.__containerFocus.bind(this) );
+		this._input.addEventListener( 'focus', this.__focus.bind(this) );
+		this._input.addEventListener( 'blur', this.__blur.bind(this) );
+
+		node.replaceWith( fragment.firstChild );
 	}
 }
