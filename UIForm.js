@@ -24,17 +24,17 @@ class UIForm
 
 	__containerFocus()
 	{
-		console.log('__containerFocus', this);
-		//this._input.focus();
+		console.log('__containerFocus');
+		this._input.focus();
 	}
 	__focus()
 	{
-		console.log('__focus', this);
+		console.log('__focus');
 	}
 
 	__blur()
 	{
-		console.log('__blur', this);
+		console.log('__blur');
 	}
 }
 
@@ -55,10 +55,17 @@ class UIFormText extends UIForm
 
 		for( let i = 0; i < node.attributes.length; ++i )
 		{
-			this._input.setAttribute( node.attributes[i].name, node.attributes[i].value );
-			if( node.attributes[i].name == 'name' )
+			if( node.attributes[i].name.substr(0, 2 ) === 'on' )
 			{
-				this._label.setAttribute( 'for', node.attributes[i].value );
+				this._input.addEventListener( node.attributes[i].name.substr(2, node.attributes[i].name.length ), function () { eval( node.attributes[i].value ) } );
+			}
+			else
+			{
+				this._input.setAttribute( node.attributes[i].name, node.attributes[i].value );
+				if( node.attributes[i].name == 'id' )
+				{
+					this._label.setAttribute( 'for', node.attributes[i].value );
+				}
 			}
 		}
 

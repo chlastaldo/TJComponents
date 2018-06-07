@@ -13,7 +13,7 @@
 			}
 		</script>
 		<div id="respon">
-			<UIForm name="test" id="test" type="text" value="" placeholder="placeholder">Makovicka</UIForm>
+			<UIForm name="test" onchange="console.log(this.value)" onclick="console.log(this)" id="test" type="text" value="" placeholder="placeholder">Makovicka</UIForm>
 		</div>
 		<script>
 			let form = new UIForm( document.getElementById('respon'),
