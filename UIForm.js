@@ -7,21 +7,26 @@ class UIForm
 		this._inputs = {};
 
 		this._nodes = this._parentNode.querySelectorAll('UIForm');
-
-	}
-
-	addElements( )
-	{
-
+		
 		this._nodes.forEach( ( node ) =>
 		{
 			if( node.getAttribute( 'type' ) === 'text' )
 			{
-				this._inputs[ name ] = new UIFormText( this._parentNode, this._options, node );
+				this._inputs[ name ] = new UIFormText( this._options, node );
 			}
 		} )
-	}
 
+	}
+}
+
+class UIFormElements 
+{
+	constructor( parentOptions )
+	{
+		this._parentOptions = parentOptions;
+		this._theme = this._parentOptions.theme;
+	}
+	
 	__containerFocus()
 	{
 		console.log('__containerFocus');
@@ -38,13 +43,13 @@ class UIForm
 	}
 }
 
-class UIFormText extends UIForm
+class UIFormText extends UIFormElements
 {
-	constructor( parentNode, parentOptions, node )
+	constructor( parentOptions, node )
 	{
-		super( parentNode, parentOptions )
+		super( parentOptions )
 
-		let [ html, container, input, label ] = this._options.theme.text;
+		let [ html, container, input, label ] = this._theme.text;
 		let fragment = document.createElement('div');
 			fragment.innerHTML = html;
 
