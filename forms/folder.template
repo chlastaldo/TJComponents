@@ -1,4 +1,4 @@
-<style require="/style/form.style">
+<style require="/ui/style/form.style">
 .input-text
 {
     @form_border;

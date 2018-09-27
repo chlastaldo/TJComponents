@@ -1,8 +1,9 @@
-<style require="/style/form.style">
+<style require="/ui/style/form.style">
 .input-text
 {
     @form_border;
 	@form_border_radius;
+	@border-box;
     display: block;
     height: 42px;
     line-height: 40px;
@@ -50,11 +51,13 @@
 		left: 5px;
 		line-height: 20px;
 		position: absolute;
-		top: 12px;
+		top: 10px;
 		color: $form_label_color;
 		transition: top 50ms ease-in 0s,font-size 50ms ease-in 0s,color 50ms ease-in 0s;
 		-webkit-transition: top 50ms ease-in 0s,font-size 50ms ease-in 0s,color 50ms ease-in 0s;
+		@no_select;
 	}
+
 	&.focus,
 	&.fill
 	{
@@ -81,7 +84,21 @@
 			}
 		}
 	}
+
+	&.disabled
+	{
+		border-color: transparent;
+
+		input:disabled
+		{
+			color: $form_color_fill;
+			-webkit-text-fill-color:$form_color_fill;
+			-webkit-opacity: 1;
+			color: $form_color_fill;
+		}
+	}
 }
+
 </style>
 <script>
 	if( typeof Input === 'undefined' )
@@ -122,8 +139,8 @@
 		}
 	}
 </script>
-<div class={'input-text'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')+(typeof label === 'undefined' ? ' not-label' : '')}>
-	<input onkeypress="return ( event.keyCode == 13 ? false : true );" id={id} name={id} required={(typeof required !== 'undefined' ? required : null)} pattern={(typeof pattern !== 'undefined' ? pattern : null)} placeholder={(typeof placeholder !== 'undefined' ? placeholder : '')} value={(typeof value !== 'undefined' ? value : '')} class={ typeof clazz !== 'undefined' ? 'input '+clazz : 'input' } autocomplete="off" type={type}/>
+<div class={'input-text'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')+(typeof disabled !== 'undefined' && disabled === 'true' ? ' disabled' : '')+(typeof label === 'undefined' ? ' not-label' : '')} style={(typeof style !== 'undefined' ? style : null )}>
+	<input onkeypress="return ( event.keyCode == 13 ? false : true );" id={id} name={id} required={(typeof required !== 'undefined' ? required : null)} pattern={(typeof pattern !== 'undefined' ? pattern : null)} placeholder={(typeof placeholder !== 'undefined' ? placeholder : '')} value={(typeof value !== 'undefined' ? value : '')} class={ typeof clazz !== 'undefined' ? 'input '+clazz : 'input' } disabled={(typeof disabled !== 'undefined' && disabled === 'true' ? 'disabled' : null )} autocomplete="off" type={type}/>
 	if( typeof label !== 'undefined' )
 	{
 		<label for={id} class="label">{label}</label>

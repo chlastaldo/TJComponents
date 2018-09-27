@@ -1,4 +1,4 @@
-<style require="/style/form.style">
+<style require="/ui/style/form.style">
 .input-select
 {
     @form_border;
@@ -71,6 +71,31 @@
 		overflow-y: scroll;
 		max-height: 150px;
 
+		input
+		{
+			display: inline-block;
+			height: 20px;
+			margin-top: 10px;
+			margin-bottom: 10px;
+			padding: 0 5px;
+			position: relative;
+			font-family: inherit;
+			color: inherit;
+			font-size:13px;
+			width: 100%;
+			transition: margin-top 50ms ease-in 0s;
+			border: 0;
+			outline: none;
+			background-color: transparent;
+			color: $form_color;
+			@border-box;
+
+			&:invalid
+			{
+			    border: 0;
+			    box-shadow: none;
+			}
+		}
 		.select-option
 		{
 			padding: 5px;
@@ -154,8 +179,16 @@
 					item.addEventListener( 'click', this.select.bind(this, item) );
 				} );
 
+				let input_text = null;
+				if( ( input_text = this._element.querySelector('.select-wrap input[type="text"]') ) )
+				{
+					input_text.addEventListener( 'keyup', this.keyup.bind( this, input_text ) );
+				}
+
 				this._values = ( value ? [{ value, label : option[ value ] }] : [] );
 				this._setValue();
+
+				this._suggest_timeout = null;
 			}
 
 			stop()
@@ -200,6 +233,54 @@
 				this._setValue();
 			}
 
+			keyup( element )
+			{
+				if( element.getAttribute('data-request') )
+				{
+					var url = decodeURIComponent( element.getAttribute( 'data-request' ) );
+
+					window.clearTimeout( this._suggest_timeout );
+
+					this._suggest_timeout = setTimeout( () =>
+					{
+						DOM_request( 'POST', url, { query : element.value, id : 'cn=John Doe,cn=grupa,dc=xclbr-ub,dc=com' }, ( rows ) =>
+						{
+							rows = JSON.parse(rows);
+							var wrapper = element.parentNode;
+								wrapper.querySelectorAll('.select-option:not(.active)').remove();
+
+							let div = null;
+
+							for( var key in rows )
+							{
+								div = wrapper.querySelector('.select-option[data-value="'+key+'"]');
+								if( !div )
+								{
+									div = document.createElement('div');
+									div.className = 'select-option';
+									div.setAttribute('data-value', key );
+									div.innerHTML = rows[key];
+									div.addEventListener( 'click', this.select.bind(this, div) );
+								}
+								wrapper.insertBefore( div, element.nextSibling );
+							}
+
+						} );
+					}, 300 );
+				}
+				else
+				{
+					var options = element.parentNode.querySelectorAll('.select-option');
+			        if( options.length > 0 )
+			        {
+			            for( var a = 0; a < options.length; ++a )
+			            {
+			                if( !this._containsWords( options[a].innerHTML, element.value ) ){ options[a].style.display = 'none'; } else { options[a].style.display = 'block'; }
+			            }
+			        }
+				}
+			}
+
 			_setValue()
 			{
 				this._element.querySelector('.input').innerHTML = ( this._values.length > 0 ? this._values[0].label : '' );
@@ -214,13 +295,44 @@
 					this._element.classList.remove('fill');
 				}
 			}
+
+			_containsWords( haystack, words )
+		    {
+		        words = words.trim().toLowerCase();
+		        haystack = haystack.trim().toLowerCase();
+
+		        if( words.length )
+		        {
+		            if( typeof words == 'string' ){ words = words.split(/\s+/g); }
+
+		            for( var i = 0; i < words.length; ++i )
+		            {
+		                let position = -1, found = false;
+
+		                while( ( position = haystack.indexOf( words[i], position + 1 ) ) !== -1 )
+		                {
+	                        if( position != 0 && ' \t\n'.indexOf(haystack[position-1]) === -1 ) { continue; } else if( i < words.length - 1 && haystack.length > words[i].length + position && ' \t\n'.indexOf(haystack[position+words[i].length]) === -1 ) { continue; } else { found = true; break; }
+		                }
+
+		                if( !found ){ return false; }
+		            }
+		        }
+		        return true;
+		    }
+
 		}
 	}
 </script>
 <div class={'input-select'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')}>
-	<input type="hidden" value={(typeof value !== 'undefined' ? value : '')} name={(typeof id !== 'undefined' ? id : '')} id={(typeof id !== 'undefined' ? id : '')} />
+	<input type="hidden" value={(typeof value !== 'undefined' ? value : '')} name={(typeof id !== 'undefined' ? id : '')} id={(typeof id !== 'undefined' ? id : '')} data-join={(typeof join !== 'undefined' ? join : null )} />
 	<div class="input"></div>
 	<div class="select-wrap">
+		if( suggest )
+		{
+			<input placeholder="Search" autocomplete="off" class="input-element-text" onkeypress="return event.keyCode!=13" type="text" data-request={ ( typeof request !== 'undefined' ? encodeURIComponent( request ) : null ) }/>
+		}
+
+
 		for( key, item of option )
 		{
 			<div class={'select-option'+( typeof value !== 'undefined' && value === key ? ' active' : '' )} data-value={key}>{item}</div>

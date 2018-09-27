@@ -1,4 +1,4 @@
-<Select id={id} label={label} option={option} value={value} init="false"/>
+<Select id={id} label={label} option={option} value={value} join={( typeof join !== 'undefined' ? join : null )} suggest={( typeof suggest !== 'undefined' ? suggest : null )} request={( typeof request !== 'undefined' ? request : null )} init="false"/>
 <script>
 	if( typeof Multiselect === 'undefined' )
 	{
@@ -7,12 +7,18 @@
 			constructor( input, value, option )
 			{
 				super( input, value, option );
+
 				this._values = [];
-				value = value.split(',');
+				this._join = ( ( input.getAttribute('data-join') ? input.getAttribute('data-join') : ',' ) );
+
+				value = value.split( this._join );
 				value.forEach( ( item ) =>
 				{
-					this._values.push( { value : item, label : ( option[ item ] ? option[ item ] : item ) } );
-				} )
+					if( item )
+					{
+						this._values.push( { value : item, label : ( option[ item ] ? option[ item ] : item ) } );
+					}
+				} );
 			}
 
 			select( element )
@@ -36,8 +42,8 @@
 			_setValue()
 			{
 				this._element.querySelector('.input').innerHTML = this._values.map( ( value ) => { return value.label } ).filter( item => { return item != '' } ).join( ', ' );
-				this._input.value = this._values.map( ( value ) => { return value.id } );
-
+				this._input.value = this._values.map( ( value ) => { return value.value } ).join( this._join );
+				
 				if( this._input.value !== '' )
 				{
 					this._element.classList.add('fill');

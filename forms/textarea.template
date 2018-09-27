@@ -1,4 +1,4 @@
-<style require="/style/form.style">
+<style require="/ui/style/form.style">
 .input-textarea
 {
     @form_border;
@@ -10,7 +10,7 @@
     cursor: text;
     background-color: $form_background_color;
 	overflow: hidden;
-	
+
 
 	textarea
 	{
