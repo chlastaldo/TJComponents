@@ -1,0 +1,135 @@
+<style require="/style/form.style">
+.input-text
+{
+    @form_border;
+	@form_border_radius;
+    display: block;
+    height: 42px;
+    line-height: 40px;
+    position: relative;
+    cursor: text;
+    background-color: $form_background_color;
+
+	&.error
+	{
+		background-color: $form_error_background;
+		border-color: $form_error_border;
+	}
+
+	input
+	{
+		display: inline-block;
+		height: 20px;
+		margin-top: 10px;
+		margin-bottom: 10px;
+		padding: 0 5px;
+		position: relative;
+		font-family: inherit;
+		color: inherit;
+		font-size:13px;
+		width: 100%;
+		transition: margin-top 50ms ease-in 0s;
+		border: 0;
+		outline: none;
+		background-color: transparent;
+		color: $form_color;
+		@border-box;
+
+		&:invalid
+		{
+		    border: 0;
+		    box-shadow: none;
+		}
+	}
+
+	label
+	{
+		font-size: 14px;
+		font-weight: 400;
+		height: 20px;
+		left: 5px;
+		line-height: 20px;
+		position: absolute;
+		top: 12px;
+		color: $form_label_color;
+		transition: top 50ms ease-in 0s,font-size 50ms ease-in 0s,color 50ms ease-in 0s;
+		-webkit-transition: top 50ms ease-in 0s,font-size 50ms ease-in 0s,color 50ms ease-in 0s;
+	}
+	&.focus,
+	&.fill
+	{
+		input
+		{
+			color: $form_color_fill;
+			margin-bottom: 1px;
+		    margin-top: 19px;
+		}
+		label
+		{
+			color: $form_label_fill_color;
+			font-size: 11px;
+			top: 0;
+
+		}
+
+		&.not-label
+		{
+			input
+			{
+			margin-bottom: 10px;
+		    margin-top: 10px;
+			}
+		}
+	}
+}
+</style>
+<script>
+	if( typeof Input === 'undefined' )
+	{
+		window.Input = class Input
+		{
+			constructor( input )
+			{
+				this._input = input;
+				this._element = this._input.parentNode;
+				this._element.addEventListener( 'click', this.input_focus.bind(this) );
+				this._input.addEventListener( 'focus', this.focus.bind(this) );
+				this._input.addEventListener( 'blur', this.blur.bind(this) );
+			}
+
+			input_focus()
+			{
+				this._input.focus();
+			}
+
+			focus()
+			{
+				this._element.classList.add('focus');
+			}
+
+			blur()
+			{
+				this._element.classList.remove('focus');
+				if( this._input.value !== '' )
+				{
+					this._element.classList.add('fill');
+				}
+				else if( this._input.value === '' )
+				{
+					this._element.classList.remove('fill');
+				}
+			}
+		}
+	}
+</script>
+<div class={'input-text'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')+(typeof label === 'undefined' ? ' not-label' : '')}>
+	<input onkeypress="return ( event.keyCode == 13 ? false : true );" id={id} name={id} required={(typeof required !== 'undefined' ? required : null)} pattern={(typeof pattern !== 'undefined' ? pattern : null)} placeholder={(typeof placeholder !== 'undefined' ? placeholder : '')} value={(typeof value !== 'undefined' ? value : '')} class={ typeof clazz !== 'undefined' ? 'input '+clazz : 'input' } autocomplete="off" type={type}/>
+	if( typeof label !== 'undefined' )
+	{
+		<label for={id} class="label">{label}</label>
+	}
+</div>
+
+<script instance id={id}>
+	new Input( document.getElementById( id ) );
+</script>

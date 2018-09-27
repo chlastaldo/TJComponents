@@ -1,0 +1,237 @@
+<style require="/style/form.style">
+.input-select
+{
+    @form_border;
+	@form_border_radius;
+    display: block;
+    height: 42px;
+    line-height: 40px;
+    position: relative;
+    cursor: text;
+    background-color: $form_background_color;
+    color: $form_color;
+
+	.input
+	{
+		display: inline-block;
+		height: 20px;
+		line-height: 20px;
+		margin-top: 10px;
+		margin-bottom: 10px;
+		padding: 0 5px;
+		position: relative;
+		width: 100%;
+		transition: margin-top 50ms ease-in 0s;
+		border: 0;
+		outline: none;
+		@border-box;
+
+		&:after
+		{
+			content: "";
+			top: 0;
+			right: 0;
+			bottom: 0;
+			width: 20px;
+			height: 20px;
+			background: no-repeat url('/static/images/solid.svg#caret-down');
+			position: absolute;
+			text-align: center;
+			background-color: white;
+			opacity: 0;
+			transition: opacity 200ms ease-in;
+		}
+	}
+
+	label
+	{
+		font-size: 14px;
+		font-weight: 400;
+		height: 20px;
+		left: 5px;
+		line-height: 20px;
+		position: absolute;
+		top: 12px;
+		color: $form_label_color;
+		transition: top 50ms ease-in 0s,font-size 50ms ease-in 0s,color 50ms ease-in 0s;
+		-webkit-transition: top 50ms ease-in 0s,font-size 50ms ease-in 0s,color 50ms ease-in 0s;
+	}
+
+	.select-wrap
+	{
+		position: absolute;
+		left: 0;
+		top: 43px;
+		background-color: transparent;
+		width: 100%;
+		border: 1px solid transparent;
+		height: 0;
+		overflow: hidden;
+		overflow-y: hidden;
+		overflow-y: scroll;
+		max-height: 150px;
+
+		.select-option
+		{
+			padding: 5px;
+			line-height: 1;
+			font-size: 13px;
+			cursor: pointer;
+			color: $form_option_color;
+
+			&:hover,
+			&.active
+			{
+				background-color: #1E88E5;
+				color: $form_option_fill_color;
+			}
+		}
+	}
+
+	&:hover
+	{
+		.input
+		{
+			&:after
+			{
+				opacity: 0.3;
+			}
+		}
+	}
+
+	&.focus,
+	&.fill
+	{
+		.input
+		{
+			margin-bottom: 1px;
+		    margin-top: 19px;
+		}
+		label
+		{
+			font-size: 11px;
+			top: 0;
+		}
+		.input
+		{
+			color : $form_color_fill;
+			&:after
+			{
+				opacity: 0.7;
+			}
+		}
+	}
+	&.focus
+	{
+		.select-wrap
+		{
+			height: auto;
+			border: 1px solid #999999;
+			background-color: #fff;
+			z-index: 1;
+			margin-left: -1px;
+			margin-top: -1px;
+		}
+	}
+}
+</style>
+<script>
+	if( typeof Select === 'undefined' )
+	{
+		window.Select = class Select
+		{
+			constructor( input, value, option )
+			{
+				this._input = input;
+				this._element = this._input.parentNode;
+
+				this._element.addEventListener( 'click', this.focus.bind(this) );
+				this._element.addEventListener( 'mouseover', this.stop.bind(this) );
+				this._element.addEventListener( 'mouseout', this.hidden.bind(this) );
+
+				this._element.querySelectorAll('.select-option').forEach( ( item ) =>
+				{
+					item.addEventListener( 'click', this.select.bind(this, item) );
+				} );
+
+				this._values = ( value ? [{ value, label : option[ value ] }] : [] );
+				this._setValue();
+			}
+
+			stop()
+			{
+				Timers.unsetTimeout( this._input.id );
+			}
+
+			hidden( id, element )
+			{
+				Timers.setTimeout( this._input.id, () =>
+		        {
+		            this._element.classList.remove('focus');
+		        }, 500);
+			}
+
+			focus( event )
+			{
+				if( event.target.classList.contains('input-select') || event.target.classList.contains('input') )
+				{
+					this._element.querySelector('.select-wrap').style.maxHeight = Math.max( 150, ( document.body.getBoundingClientRect().height - this._element.querySelector('.select-wrap').getBoundingClientRect().y - 100 ) )+'px';
+					this._element.classList.add('focus');
+
+					if( this._element.querySelector('.select-wrap input[type="text"]') ){ this._element.querySelector('.select-wrap input[type="text"]').focus(); }
+				}
+			}
+
+			select( element )
+			{
+				this._values = [];
+				if( element.classList.contains('active') )
+				{
+					element.classList.remove('active');
+				}
+				else
+				{
+					this._element.querySelectorAll('.select-option').forEach( item => item.classList.remove('active') );
+
+					element.classList.add('active');
+					this._values.push({ value : element.getAttribute('data-value'), label : element.innerHTML });
+				}
+
+				this._setValue();
+			}
+
+			_setValue()
+			{
+				this._element.querySelector('.input').innerHTML = ( this._values.length > 0 ? this._values[0].label : '' );
+				this._input.value = ( this._values.length > 0 ? this._values[0].value : '' );
+
+				if( this._input.value !== '' )
+				{
+					this._element.classList.add('fill');
+				}
+				else if( this._input.value === '' )
+				{
+					this._element.classList.remove('fill');
+				}
+			}
+		}
+	}
+</script>
+<div class={'input-select'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')}>
+	<input type="hidden" value={(typeof value !== 'undefined' ? value : '')} name={(typeof id !== 'undefined' ? id : '')} id={(typeof id !== 'undefined' ? id : '')} />
+	<div class="input"></div>
+	<div class="select-wrap">
+		for( key, item of option )
+		{
+			<div class={'select-option'+( typeof value !== 'undefined' && value === key ? ' active' : '' )} data-value={key}>{item}</div>
+		}
+	</div>
+	<label for={id} class="label">{label}</label>
+</div>
+
+<script instance id={id} value={value} option={option} init={( typeof init !== 'undefined' ? init : 'true' )}>
+	if( init === 'true' )
+	{
+		new Select( document.getElementById( id ), value, option );
+	}
+</script>

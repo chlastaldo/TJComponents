@@ -1,0 +1,1 @@
+<input id={id} name={id} value={(typeof value !== 'undefined' ? value : '')} class={ typeof clazz !== 'undefined' ? clazz : '' } autocomplete="off" type="hidden"/>

@@ -1,0 +1,137 @@
+<style require="/style/form.style">
+.input-textarea
+{
+    @form_border;
+	@form_border_radius;
+    display: block;
+    height: 42px;
+    line-height: 40px;
+    position: relative;
+    cursor: text;
+    background-color: $form_background_color;
+	overflow: hidden;
+	
+
+	textarea
+	{
+		color: $form_color;
+		display: inline-block;
+		margin-top: 19px;
+		padding: 0 5px;
+		position: relative;
+		resize: none;
+		width: 100%;
+		height: calc(100% - 19px);
+		outline: 0;
+		font-family: inherit;
+		font-size:13px;
+		color: inherit;
+		border: 0;
+		overflow-y: auto;
+		@border-box;
+		background-color: transparent;
+		color: $form_color;
+
+		&:invalid
+		{
+		    border: 0;
+		    box-shadow: none;
+		}
+	}
+
+	label
+	{
+		font-size: 14px;
+		font-weight: 400;
+		height: 20px;
+		left: 5px;
+		line-height: 20px;
+		position: absolute;
+		top: 12px;
+		color: $form_label_color;
+		transition: top 50ms ease-in 0s,font-size 50ms ease-in 0s,color 50ms ease-in 0s;
+		-webkit-transition: top 50ms ease-in 0s,font-size 50ms ease-in 0s,color 50ms ease-in 0s;
+	}
+
+	&.error
+	{
+		background-color: $form_error_background;
+		border-color: $form_error_border;
+	}
+
+	&.focus,
+	&.fill
+	{
+		textarea
+		{
+			color: $form_color_fill;
+		}
+		label
+		{
+			font-size: 11px;
+			top: 0;
+			color: $form_label_fill_color;
+		}
+	}
+
+	&.not-label
+	{
+		textarea
+		{
+			margin-top: 5px;
+			height: calc(100% - 10px);
+		}
+	}
+}
+</style>
+<script>
+if( typeof Textarea === 'undefined' )
+{
+	window.Textarea = class Textarea
+	{
+		constructor( input )
+		{
+			this._input = input;
+			this._element = this._input.parentNode;
+
+			this._element.addEventListener( 'click', this.input_focus.bind(this) );
+			this._input.addEventListener( 'focus', this.focus.bind(this) );
+			this._input.addEventListener( 'blur', this.blur.bind(this) );
+		}
+
+		input_focus()
+		{
+			this._input.focus();
+		}
+
+		focus()
+		{
+			this._element.classList.add('focus');
+		}
+
+		blur()
+		{
+			this._element.classList.remove('focus');
+			if( this._input.value !== '' )
+			{
+				this._element.classList.add('fill');
+			}
+			else if( this._input.value === '' )
+			{
+				this._element.classList.remove('fill');
+			}
+		}
+	}
+}
+</script>
+<div class={'input-textarea'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')+(typeof label === 'undefined' ? ' not-label' : '')} style={ typeof height !== 'undefined' ? 'height:'+height+';' : '' }>
+	<textarea id={id} name={id} disabled={(typeof disabled !== 'undefined' ? disabled : null)} required={(typeof required !== 'undefined' ? required : null)} placeholder={(typeof placeholder !== 'undefined' ? placeholder : '')} class={ typeof clazz !== 'undefined' ? 'textarea '+clazz : 'textarea' } autocomplete="off">{(typeof value !== 'undefined' ? value : '')}</textarea>
+	if( typeof label !== 'undefined' )
+	{
+		<label for={id} class="label">{label}</label>
+	}
+</div>
+
+<script instance id={id}>
+	new Textarea( document.getElementById( id ) );
+</script>

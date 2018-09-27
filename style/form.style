@@ -1,0 +1,23 @@
+@light_font	{ font-weight: 200 @( dpr > 1 : 100 ); }
+@normal_font{ font-weight: 400 @( dpr > 1 : 200 ); }
+@medium_font{ font-weight: 400; }
+@bold_font	{ font-weight: 600; }
+
+@no_events{ -moz-pointer-events: none; -webkit-pointer-events: none; -ms-pointer-events: none; pointer-events: none; }
+@no_select{ -moz-user-select: none; -webkit-user-select: none; -ms-user-select: none; user-select: none; cursor: defualt; }
+@border-box{ -moz-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; }
+
+@form_border{ border: 1px solid #999; }
+@form_border_radius{ border-radius: 0; }
+$form_background_color: #fff;
+$form_color: #999;
+$form_color_fill: #1a1a1a;
+
+$form_label_color: #999;
+$form_label_fill_color: #1a1a1a;
+
+$form_option_color: #fff;
+$form_option_fill_color: #fff;
+
+$form_error_background: #ffebee;
+$form_error_border: #d50000;

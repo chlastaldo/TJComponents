@@ -1,0 +1,39 @@
+<style>
+.button{ -moz-user-select: none; -webkit-user-select: none; -ms-user-select: none; user-select: none; cursor: defualt; display: inline-block; position: relative; vertical-align: top; text-align: center; border-radius: 3px;  height:34px; line-height: 32px; min-width: 100px; font-size: 12px; padding: 0 10px; box-sizing: border-box; cursor: pointer; transition: border 150ms, color 150ms, background 150ms; }
+.button{ font-weight: 600;background-color: #242838; border: 1px solid #242838; color: #c1c4ce;  }
+.button:hover{ background: #242838; border-color: #242838; }
+.button.small{ height: 22px; line-height: 20px; border-weight: 1px; }
+.button.empty{ background-color: #525666; border-color:  #525666; color: #c1c4ce; }
+.button.empty:hover{ border-color: #525666; color: #c1c4ce; }
+.button.red{ background-color: #F44336; border-color: #F44336; color: #fff; }
+.button.red:hover{ background-color: #F44336; border-color: #F44336; color: #fff; }
+.button.green{ background-color: #4CAF50; border-color: #4CAF50; color: #fff; }
+.button.green:hover{ background-color: #4CAF50; border-color: #4CAF50; color: #fff; }
+.button.blue{ background-color: #1E88E5; border-color: #1E88E5; color: #fff; }
+.button.blue:hover{ background-color: #1E88E5; border-color: #1E88E5; color: #fff; }
+.button.clear{ background-color: transparent; border-color: transparent; color: #a8adbf; }
+.button.clear:hover{ background-color: transparent; border-color: transparent; color: #545454; text-decoration: underline;}
+
+.button.button_loader{ color: transparent; }
+.button.button_loader:hover{ color: transparent; }
+.button.button_loader:after
+{
+    content: "\f110";
+    font-family: FontAwesome;
+    color: #fff;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 8px;
+    height: 15px;
+    width: 15px;
+    margin: 0 auto;
+    text-align: center;
+    line-height: 15px;
+    font-size: 14px;
+    -webkit-animation: a-loader 2s infinite linear;
+    animation: a-loader 2s infinite linear;
+}
+</style>
+
+<div id={( typeof id !== 'undefined' ? id : '' )} style={( typeof style !== 'undefined' ? style : '' )} class={( typeof clazz !== 'undefined' ? 'button '+clazz : 'button' )} onclick={( typeof onclick !== 'undefined' ? onclick : '' )}>{label}</div>

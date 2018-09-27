@@ -1,0 +1,60 @@
+<style require="/style/form.style">
+.input-checkbox
+{
+    display: block;
+    height: 20px;
+    line-height: 20px;
+    position: relative;
+    cursor: text;
+
+	input[type="checkbox"]
+	{
+		display: none;
+	}
+
+	label
+	{
+		font-size: 14px;
+		font-weight: 400;
+		height: 20px;
+		margin-left: 22px;
+		line-height: 20px;
+		position: relative;
+		cursor: pointer;
+		color: $form_color;
+
+		&:after
+		{
+		    content: "";
+		    position: absolute;
+		    left: -22px;
+		    top: 2px;
+		    width: 14px;
+		    height: 14px;
+		    @form_border;
+		    line-height: 14px;
+		    text-align: left;
+		    font-size: 12px;
+			text-align: center;
+			background-color: $form_background_color;
+			color: $form_color;
+		}
+	}
+
+
+
+	input[type="checkbox"]:checked + label.input-element-checkbox-label::after
+	{
+	    content: "\002714";
+		font-size: 16px;
+		font-weight: 500;
+		font-family: "Times", "Times New Roman", "serif", "sans-serif";
+		text-rendering: optimizeLegibility;
+	}
+}
+</style>
+
+<div class="input-checkbox">
+	<input type="checkbox" checked={( typeof checked !== 'undefined' && checked === 1 ? 'checked' : null )} value={( typeof value !== 'undefined' ? value : '' )} name={( typeof id !== 'undefined' ? id : '' )} id={( typeof id !== 'undefined' ? id : '' )} onchange={( typeof onchange !== 'undefined' ? onchange : '' )}/>
+	<label class="input-element-checkbox-label" for={( typeof id !== 'undefined' ? id : '' )}>{( typeof label !== 'undefined' ? label : '' )}</label>
+</div>

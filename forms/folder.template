@@ -1,0 +1,122 @@
+<style require="/style/form.style">
+.input-text
+{
+    @form_border;
+	@form_border_radius;
+    display: block;
+    height: 42px;
+    line-height: 40px;
+    position: relative;
+    cursor: text;
+    background-color: $form_background_color;
+    color: $form_color;
+
+	&.error
+	{
+		background-color: #ffebee;
+    	border-color: #d50000;
+	}
+	input[type="file"]{ display: none; }
+	.input
+	{
+		display: inline-block;
+		vertical-align: top;
+	    text-align: left;
+		line-height: 20px;
+		height: 20px;
+		margin-top: 10px;
+		margin-bottom: 10px;
+		padding: 0 5px;
+		position: relative;
+		font-family: inherit;
+		color: inherit;
+		font-size:13px;
+		width: 100%;
+		transition: margin-top 50ms ease-in 0s;
+		border: 0;
+		outline: none;
+		background-color: transparent;
+		@border-box;
+		@no_select;
+	}
+
+	label
+	{
+		font-size: 14px;
+		font-weight: 400;
+		height: 20px;
+		left: 5px;
+		line-height: 20px;
+		position: absolute;
+		top: 12px;
+		transition: top 50ms ease-in 0s,font-size 50ms ease-in 0s,color 50ms ease-in 0s;
+		@no_select;
+		$form_label_color: #82889c;
+	}
+	&.focus,
+	&.fill
+	{
+		.input
+		{
+			color: $form_color_fill;
+			margin-bottom: 1px;
+		    margin-top: 19px;
+		}
+		label
+		{
+			font-size: 11px;
+			top: 0;
+			color: $form_label_fill_color;
+		}
+
+	}
+}
+</style>
+<script>
+	if( typeof Folder === 'undefined' )
+	{
+		window.Folder = class Folder
+		{
+			constructor( input )
+			{
+				this._input = input;
+				this._element = this._input.parentNode;
+				this._element.addEventListener( 'click', this.input_focus.bind(this) );
+				this._input.addEventListener( 'change', this.change.bind(this) );
+
+			}
+
+			input_focus()
+			{
+				this._input.click();
+			}
+
+			change()
+			{
+				let file = this._input.files[0].path;
+
+				if( file !== '' )
+				{
+					this._element.querySelector( '.input' ).innerHTML = file;
+					this._element.classList.add('fill');
+				}
+				else
+				{
+					this._element.querySelector( '.input' ).innerHTML = '';
+					this._element.classList.remove('fill');
+				}
+			}
+		}
+	}
+
+	//this.
+</script>
+<div class={'input-text'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')}>
+	<div class={ typeof clazz !== 'undefined' ? 'input '+clazz : 'input' }>{(typeof value !== 'undefined' ? value : '')}</div>
+	<label class="label">{label}</label>
+	<input type="file" id={id} name={id} webkitdirectory="" directory="" required={(typeof required !== 'undefined' ? required : null)}/>
+</div>
+
+<script instance id={id}>
+	new Folder( document.getElementById( id ) );
+</script>
