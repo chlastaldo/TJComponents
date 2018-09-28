@@ -15,6 +15,8 @@
 .button.orange:hover{ background-color: #FB8C00; border-color: #FB8C00; color: #fff; }
 .button.purple{ background-color: #8E24AA; border-color: #8E24AA; color: #fff; }
 .button.purple:hover{ background-color: #8E24AA; border-color: #8E24AA; color: #fff; }
+.button.silver{ background-color: #9E9E9E; border-color: #9E9E9E; color: #fff; }
+.button.silver:hover{ background-color: #9E9E9E; border-color: #9E9E9E; color: #fff; }
 .button.clear{ background-color: transparent; border-color: transparent; color: #a8adbf; }
 .button.clear:hover{ background-color: transparent; border-color: transparent; color: #545454; text-decoration: underline;}
 
@@ -163,4 +165,4 @@ if( typeof script !== 'undefined' && script === 'true' )
 	</script>
 }
 
-<div id={( typeof id !== 'undefined' ? id : '' )} style={( typeof style !== 'undefined' ? style : '' )} class={( typeof clazz !== 'undefined' ? 'button '+clazz : 'button' )} onclick={( typeof onclick !== 'undefined' ? onclick : '' )}>{label}</div>
+<div id={( typeof id !== 'undefined' ? id : '' )} title={( typeof title !== 'undefined' ? title : null )} style={( typeof style !== 'undefined' ? style : '' )} class={( typeof clazz !== 'undefined' ? 'button '+clazz : 'button' )} onclick={( typeof onclick !== 'undefined' ? onclick : '' )}>{label}</div>
