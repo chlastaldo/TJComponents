@@ -1,4 +1,4 @@
-<style require="/ui/style/form.style">
+<style require="/style/form.style">
 .input-checkbox
 {
     display: block;
@@ -48,7 +48,7 @@
 	    content: "\2715";
 		font-size: 15px;
 		font-weight: 200;
-		font-family: Arial,Helvetica Neue,Helvetica,sans-serif; 
+		font-family: Arial,Helvetica Neue,Helvetica,sans-serif;
 		text-rendering: optimizeLegibility;
 		color: $form_color_fill;
 	}

@@ -1,0 +1,122 @@
+<script>
+	if( typeof Form === 'undefined' )
+	{
+		window.Form = class Form
+		{
+			constructor( form )
+			{
+				this.form = form;
+			}
+
+			removeDisable( selector = '' )
+			{
+				Array.from( this.form.elements ).forEach( ( input ) =>
+				{
+					if( selector === '' || ( selector != '' && input.classList.contains( selector ) ) )
+					{
+						input.disabled = false;
+						input.parentNode.classList.remove('disabled');
+					}
+				} );
+			}
+
+			setValue( input, value )
+			{
+				this.form.elements[input].value = value;
+				this.form.elements[input].parentNode.classList[ ( value === '' ? 'remove' : 'add' ) ]( 'fill' );
+			}
+
+			addError( validity )
+			{
+				validity.forEach( ( valid ) => { this.form.elements[valid].parentNode.classList.add( 'error' ) } )
+			}
+
+			removeError()
+			{
+				Array.from( this.form.elements ).forEach( ( input ) => { input.parentNode.classList.remove( 'error' ) } )
+			}
+
+			/*
+			customError	Set to true, if a custom validity message is set.
+			patternMismatch	Set to true, if an element's value does not match its pattern attribute.
+			rangeOverflow	Set to true, if an element's value is greater than its max attribute.
+			rangeUnderflow	Set to true, if an element's value is less than its min attribute.
+			stepMismatch	Set to true, if an element's value is invalid per its step attribute.
+			tooLong	Set to true, if an element's value exceeds its maxLength attribute.
+			typeMismatch	Set to true, if an element's value is invalid per its type attribute.
+			valueMissing	Set to true, if an element (with a required attribute) has no value.
+			valid	Set to true, if an element's value is valid.
+			*/
+			checkValidity()
+			{
+				var notValidElements = [];
+
+				Array.from( this.form.elements ).forEach( ( input ) =>
+				{
+					if( input.getAttribute('required') && !input.validity[ input.getAttribute('required') ] )
+					{
+						notValidElements.push( input.name );
+					}
+				} )
+
+				return notValidElements;
+			}
+
+			data()
+			{
+				let data = {};
+				for( var pair of ( new FormData(this.form) ).entries() )
+				{
+					data[ pair[0] ] = pair[1];
+				}
+
+				return data;
+			}
+
+			post( form, callback = null )
+			{
+				this.form = form;
+				this.removeError();
+
+				let methods = { 'PUT' 	: 'application/json', 'POST'	: 'application/json', 'PATCH' : 'application/json', 'DELETE': 'application/json' };
+				let method = form.getAttribute('method');
+
+				if( Object.keys( methods ).indexOf( method ) === -1 ){ console.log( 'Unsupported method '+ method ); return null; }
+
+				let checkInputs =  this.checkValidity();
+				if( checkInputs.length > 0 ){ this.addError( checkInputs ); return; }
+
+				let data = {};
+				for( var pair of ( new FormData(form) ).entries() ) { data[ pair[0] ] = pair[1]; }
+
+				return fetch( form.getAttribute('action'), { method : method, body : JSON.stringify( data ), headers : new Headers({'Content-Type': methods[method], 'Cache-Control' : 'no-cache' }) } )
+					.then( ( response ) =>
+					{
+						if( ['application/json'].includes( response.headers.get('Content-Type') ) )
+						{
+							return response.json();
+						}
+						else
+						{
+							return response.text();
+						}
+					})
+					.then( ( response ) =>
+					{
+						if( callback )
+						{
+							callback( response )
+						}else{ console.log( response );  }
+					})
+					.catch(e =>
+					{
+						console.log( e, 'Exception' );
+					});
+			}
+		}
+	}
+</script>
+
+<form id={id} name={id} action={action} method={ ( typeof method === 'undefined' ? 'GET' : 'POST' ) } target={ ( typeof target !== 'undefined' ? target : null ) }>
+	{CONTENT}
+</form>

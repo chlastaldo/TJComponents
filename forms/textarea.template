@@ -1,4 +1,4 @@
-<style require="/ui/style/form.style">
+<style require="/style/form.style">
 .input-textarea
 {
     @form_border;
@@ -124,7 +124,7 @@ if( typeof Textarea === 'undefined' )
 	}
 }
 </script>
-<div class={'input-textarea'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')+(typeof label === 'undefined' ? ' not-label' : '')} style={ typeof height !== 'undefined' ? 'height:'+height+';' : '' }>
+<div class={'input-textarea'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')+(typeof label === 'undefined' ? ' not-label' : '')} style={ ( typeof style !== 'undefined' ? style : '' )+( typeof height !== 'undefined' ? 'height:'+height+';' : '' ) }>
 	<textarea id={id} name={id} disabled={(typeof disabled !== 'undefined' ? disabled : null)} required={(typeof required !== 'undefined' ? required : null)} placeholder={(typeof placeholder !== 'undefined' ? placeholder : '')} class={ typeof clazz !== 'undefined' ? 'textarea '+clazz : 'textarea' } autocomplete="off">{(typeof value !== 'undefined' ? value : '')}</textarea>
 	if( typeof label !== 'undefined' )
 	{
