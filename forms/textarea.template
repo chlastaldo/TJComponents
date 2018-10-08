@@ -107,12 +107,22 @@ if( typeof Textarea === 'undefined' )
 	{
 		constructor( input )
 		{
+			input._class = this;
 			this._input = input;
 			this._element = this._input.parentNode;
 
 			this._element.addEventListener( 'click', this.input_focus.bind(this) );
 			this._input.addEventListener( 'focus', this.focus.bind(this) );
 			this._input.addEventListener( 'blur', this.blur.bind(this) );
+			this._input.addEventListener( 'blur', this.blur.bind(this) );
+
+			if( this._element.getAttribute('autogrow') && this._element.getAttribute('autogrow') === 'true' )
+			{
+				this._input.addEventListener('keypress', this.autogrow.bind(this ) );
+				this._input.addEventListener('keydown', this.autogrow.bind(this ) );
+				this._input.addEventListener('keyup', this.autogrow.bind(this) );
+				this.autogrow.bind(this)();
+			}
 		}
 
 		input_focus()
@@ -137,10 +147,17 @@ if( typeof Textarea === 'undefined' )
 				this._element.classList.remove('fill');
 			}
 		}
+
+		autogrow( event = {} )
+		{
+			this._input.style.cssText = 'height:auto;';
+			this._input.style.cssText = 'height:' + ( parseInt( this._input.scrollHeight ) + ( event.keyCode === 13 && event.type !== 'keyup' ? parseInt( window.getComputedStyle(this._input)['line-height'] ) : 0 ) ) + 'px';
+			this._element.style.height = parseInt( this._input.style.height ) + 25 + 'px';
+		}
 	}
 }
 </script>
-<div class={'input-textarea'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')+(typeof disabled !== 'undefined' && disabled === 'true' ? ' disabled' : '')+(typeof label === 'undefined' ? ' not-label' : '')} style={ ( typeof style !== 'undefined' ? style : '' )+( typeof height !== 'undefined' ? 'height:'+height+';' : '' ) }>
+<div class={'input-textarea'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')+(typeof disabled !== 'undefined' && disabled === 'true' ? ' disabled' : '')+(typeof label === 'undefined' ? ' not-label' : '')} style={ ( typeof style !== 'undefined' ? style : '' )+( typeof height !== 'undefined' ? 'height:'+height+';' : '' ) } autogrow={(typeof autogrow !== 'undefined' && autogrow === 'true' ? autogrow : null )}>
 	<textarea id={id} name={id} onkeyup={(typeof onkeyup !== 'undefined' ? onkeyup : null)} onchange={(typeof onchange !== 'undefined' ? onchange : null)} disabled={(typeof disabled !== 'undefined' ? disabled : null)} required={(typeof required !== 'undefined' ? required : null)} placeholder={(typeof placeholder !== 'undefined' ? placeholder : '')} class={ typeof clazz !== 'undefined' ? 'textarea '+clazz : 'textarea' } autocomplete="off">{(typeof value !== 'undefined' ? value : '')}</textarea>
 	if( typeof label !== 'undefined' )
 	{

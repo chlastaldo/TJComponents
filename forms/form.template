@@ -16,6 +16,10 @@
 					{
 						input.disabled = false;
 						input.parentNode.classList.remove('disabled');
+						if( input.tagName === 'TEXTAREA' && ( input.parentNode.getAttribute('autogrow') && input.parentNode.getAttribute('autogrow') === 'true' ) )
+						{
+							setTimeout( () => { input._class.autogrow(); }, 50 );
+						}
 					}
 				} );
 			}
@@ -117,6 +121,6 @@
 	}
 </script>
 
-<form id={id} name={id} action={action} method={ ( typeof method === 'undefined' ? 'GET' : 'POST' ) } target={ ( typeof target !== 'undefined' ? target : null ) }>
+<form id={id} name={id} action={action} method={ ( typeof method === 'undefined' ? 'GET' : method ) } target={ ( typeof target !== 'undefined' ? target : null ) }>
 	{CONTENT}
 </form>
