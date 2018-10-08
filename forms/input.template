@@ -4,7 +4,9 @@
     @form_border;
 	@form_border_radius;
 	@border-box;
-    display: block;
+	display: inline-block;
+	vertical-align: top;
+	width: 100%;
     height: 42px;
     line-height: 40px;
     position: relative;
@@ -69,9 +71,9 @@
 		}
 		label
 		{
-			color: $form_label_fill_color;
-			font-size: 11px;
 			top: 0;
+			font-size: 13px;
+			color: $form_label_fill_color;
 
 		}
 
@@ -79,8 +81,8 @@
 		{
 			input
 			{
-			margin-bottom: 10px;
-		    margin-top: 10px;
+				margin-bottom: 10px;
+			    margin-top: 10px;
 			}
 		}
 	}
@@ -88,6 +90,7 @@
 	&.disabled
 	{
 		border-color: transparent;
+		background: transparent;
 
 		input:disabled
 		{

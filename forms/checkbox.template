@@ -45,7 +45,7 @@
 
 	input[type="checkbox"]:checked + label.input-element-checkbox-label::after
 	{
-	    content: "\2715";
+	    content: "\002714";
 		font-size: 15px;
 		font-weight: 200;
 		font-family: Arial,Helvetica Neue,Helvetica,sans-serif;
@@ -56,6 +56,6 @@
 </style>
 
 <div class="input-checkbox" style={(typeof style !== 'undefined' ? style : null )}>
-	<input type="checkbox" checked={( typeof checked !== 'undefined' && checked === 1 ? 'checked' : null )} value={( typeof value !== 'undefined' ? value : '' )} name={( typeof id !== 'undefined' ? id : '' )} id={( typeof id !== 'undefined' ? id : '' )} onchange={( typeof onchange !== 'undefined' ? onchange : '' )}/>
+	<input type="checkbox" checked={( typeof checked !== 'undefined' && parseInt(checked) === 1 ? 'checked' : null )} value={( typeof value !== 'undefined' ? value : '' )} name={( typeof id !== 'undefined' ? id : '' )} id={( typeof id !== 'undefined' ? id : '' )} onchange={( typeof onchange !== 'undefined' ? onchange : '' )}/>
 	<label class="input-element-checkbox-label" for={( typeof id !== 'undefined' ? id : '' )}>{( typeof label !== 'undefined' ? label : '' )}</label>
 </div>
