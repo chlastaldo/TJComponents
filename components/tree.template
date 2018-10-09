@@ -1,0 +1,311 @@
+<style>
+	.Tree
+	{
+		padding: 10px;
+		-moz-user-select: none; -webkit-user-select: none; -ms-user-select: none; user-select: none; cursor: defualt;
+		color: #999;
+		.TreeNode
+		{
+			position: relative;
+
+			&.open
+			{
+				> .expand,
+				> .label
+				{
+					font-weight: 600;
+					color: #fff;
+				}
+			}
+
+			&.disable
+			{
+				.label{ color: #999; font-style: italic;}
+			}
+			.label
+			{
+				line-height: 22px;
+				height: 22px;
+				margin: 4px 0 4px 28px;
+				-moz-user-select: none; -webkit-user-select: none; -ms-user-select: none; user-select: none; cursor: defualt;
+
+				span
+				{
+					cursor: pointer;
+				}
+			}
+			.expand
+			{
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 22px;
+				width: 24px;
+				cursor: default;
+
+				&:after
+				{
+					content: "\f15b";
+					position: absolute;
+					top: 0;
+					left: 0;
+
+					height: 22px;
+					width: 24px;
+					line-height: 22px;
+					text-align: center;
+					font-family: 'Font Awesome 5 Free';
+					font-weight: 900;
+					font-size: 16px;
+				}
+			}
+
+			&.expandable
+			{
+				> .expand
+				{
+					background-color: transparent;
+					cursor: pointer;
+
+					&:after
+					{
+						content: "\f07c";
+					}
+				}
+			}
+
+			&.collapsed
+			{
+				&.expandable
+				{
+					> .expand
+					{
+						cursor: pointer;
+						&:after
+						{
+							content: "\f07b";
+						}
+					}
+				}
+			}
+
+
+			.children
+			{
+				padding-left: 20px;
+
+				&.loading
+				{
+					&:before
+					{
+						background: transparent;
+					}
+				}
+
+				&:before
+				{
+					content: "";
+					position: absolute;
+					left: 9px;
+					top: 20px;
+					bottom: 11px;
+					width: 1px;
+					background: #4a4a4a;
+				}
+
+				.TreeNode
+				{
+					&:after
+					{
+						content: "";
+						position: absolute;
+						left: -11px;
+						top: 11px;
+						height: 1px;
+						background: #4a4a4a;
+						width: 11px;
+					}
+
+					&:last-child
+					{
+						&:before
+						{
+							content: "";
+							position: absolute;
+							left: -11px;
+							top: 11px;
+							bottom: 11px;
+							width: 1px;
+							background: #262831;
+						}
+					}
+
+				}
+			}
+
+			&.collapsed
+			{
+				.children{ display: none; }
+			}
+		}
+	}
+
+	.context-menu
+	{
+		position: absolute;
+
+		background: rgba(255, 255, 255, 0.95);
+		box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.35);
+		padding: 6px 0;
+		border: 1px solid rgba(0, 0, 0, 0.125);
+		min-width: 150px;
+
+
+		.context-menu-item
+		{
+			position: relative;
+			font-size: 14px;
+  			line-height: 15px;
+
+			height: 21px;
+			line-height: 21px;
+			padding-left: 15px;
+			padding-right: 4px;
+			cursor: pointer;
+
+			&:hover
+			{
+				background-color: #03A9F4;
+				color: #fff;
+			}
+
+		}
+	}
+
+</style>
+<script>
+	function openTreeNode( node, type )
+	{
+		let old_open = document.querySelector('.TreeNode.open');
+		if( old_open && old_open != node ){ old_open.classList.remove('open') }
+
+		getDetail( node, { id : node.getAttribute('data-id'), type : node.getAttribute('data-type') } );
+	}
+
+	function getDetail( node, post )
+	{
+		DOM_request( 'POST', '/detail', post, ( message ) =>
+		{
+			if( node ){ node.classList.add('open'); }
+			html( '#Page #Detail', message );
+		} );
+	}
+
+	function refreshTreeNode( id )
+	{
+		var node = document.querySelector('.TreeNode[data-id="'+id+'"]');
+			node.classList.add('collapsed');
+			node.querySelector('.children').innerHTML = '';
+			node.querySelector('.expand').click();
+	}
+
+	function expandTreeNode( node, type )
+	{
+		if( node.classList.contains( 'collapsed' ) )
+		{
+			if( node.childNodes[2].childNodes.length === 0 )
+			{
+				node.childNodes[2].classList.add( 'loading' );
+
+				DOM_request( 'POST', '/children', { id : node.getAttribute('data-id') }, ( message ) =>
+				{
+					node.childNodes[2].classList.remove( 'loading' );
+					node.childNodes[2].innerHTML = message;
+				} );
+			}
+
+			node.classList.remove( 'collapsed' );
+
+		}
+		else
+		{
+			node.classList.add( 'collapsed' );
+		}
+	}
+
+	class Contextmenu
+	{
+		constructor( element, event )
+		{
+			this.element = ( typeof element === 'string' ? document.querySelector( element ) : element );
+			this.menuItems =  { newTest : 'New Test', newGroup : 'New Group' };
+
+			this.render( event );
+		}
+
+		render( event )
+		{
+			DOM_stopPropagation(event);
+
+			this.on_action = this.actionContectmenu.bind( this );
+			this.on_close = this.closeContextmenu.bind(this);
+			this.on_contextmenu = ( event )=>{ DOM_stopPropagation( event ) };
+			this.contextmenu = this._renderElement( 'div', '', { 'class' : 'context-menu' }, {} );
+
+			for( let key in this.menuItems )
+			{
+				this.contextmenu.appendChild( this._renderElement( 'div', this.menuItems[key], { 'class' : 'context-menu-item', 'action' : key }, { click : this.on_action, contextmenu : this.on_contextmenu } ) );
+			}
+
+			this.contextmenu.style.position = 'absolute';
+			this.contextmenu.style.top = event.clientY+'px';
+			this.contextmenu.style.left = event.clientX+'px';
+
+			this.element.addClass('contextmenu');
+
+			document.body.appendChild( this.contextmenu );
+			document.body.addEventListener( 'mouseup', this.on_close );
+			return false;
+		}
+
+		actionContectmenu( event )
+		{
+			DOM_stopPropagation(event);
+			const action = event.target.getAttribute('action');
+			if( ['newTest', 'newGroup'].includes( action ) )
+			{
+				let node = document.querySelector('.TreeNode.open');
+				if( node ){ node.classList.remove('open') }
+				getDetail( null, { type : ( action === 'newTest' ? 'test' : 'group' ), parentId : this.element.parentNode.parentNode.getAttribute('data-id') } );
+			}
+
+			this.element.removeClass('contextmenu');
+			this.contextmenu.remove();
+			delete this.contextmenu;
+			document.body.removeEventListener( 'mouseup', this.on_close );
+		}
+
+		closeContextmenu( event )
+		{
+			if( ( event.target.hasClass('context-menu') && this.contextmenu === event.target ) || ( event.target.parentSelector('.context-menu') === this.contextmenu && event.target.hasClass('context-menu-item') ) ){ return false; }
+			this.element.removeClass('contextmenu');
+			this.contextmenu.remove();
+			delete this.contextmenu;
+			document.body.removeEventListener( 'mouseup', this.on_close );
+		}
+
+		_renderElement( element, html = '', attributes = {}, listeners = {} )
+		{
+			let item = document.createElement( element );
+			item.innerHTML = html;
+
+			for( let attr in attributes ){ item.setAttribute( attr, attributes[ attr ] ); }
+			for( let listener in listeners ){ item.addEventListener( listener, listeners[listener] ); }
+
+			return item;
+		}
+	}
+</script>
+<div class="Tree">
+	<Treenodes tree={tree}/>
+</div>

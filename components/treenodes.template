@@ -1,0 +1,4 @@
+for( node of tree )
+{
+	<TreeNode node={node} checkbox={ ( typeof checkbox !== 'undefined' ? checkbox : null ) }/>
+}
