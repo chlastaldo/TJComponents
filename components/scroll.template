@@ -1,0 +1,816 @@
+<style>
+	$overlay-box_b : rgba(0,0,0,0.45);
+	$overlay-box_w : rgba(255,255,255,0.45);
+
+	$scroll-handle_b : rgba(115,115,115,0);
+	$scroll-handle_w : rgba(255, 255, 255, 0);
+
+	$wrapper-scroll-handle-bg_b : rgba(115,115,115,0);
+	$wrapper-scroll-handle-bg_w : rgba(255,255,255,0);
+
+	$wrapper-scroll-handle-an_b : scrollHandleFadeOut;
+	$wrapper-scroll-handle-an_w : scrollHandleFadeOutWhite;
+
+	$scroll-handle-active_b : rgba(115,115,115,0.5);
+	$scroll-handle-active_w : rgba(255,255,255,0.5);
+
+	$scroll-handle-scrolling_b : rgba(115,115,115,0.25);
+	$scroll-handle-scrolling_w : rgba(255,255,255,0.25);
+
+	$scroll-handle-drag_b : rgba(115,115,115,1);
+	$scroll-handle-drag_w : rgba(255,255,255,1);
+
+	.Scroll-wrapper
+	{
+		position: relative;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		max-height: inherit;
+		overflow: hidden;
+
+		--overlay-box: $overlay-box_b;
+		--scroll-handle: $scroll-handle_b;
+		--wrapper-scroll-handle-bg: $wrapper-scroll-handle-bg_b;
+		--wrapper-scroll-handle-an: $wrapper-scroll-handle-an_b;
+		--scroll-handle-active: $scroll-handle-active_b;
+		--scroll-handle-scrolling: $scroll-handle-scrolling_b;
+		--scroll-handle-drag: $scroll-handle-drag_b;
+
+		&.white
+		{
+			--overlay-box : $overlay-box_w;
+			--scroll-handle: $scroll-handle_w;
+			--wrapper-scroll-handle-bg: $wrapper-scroll-handle-bg_w;
+			--wrapper-scroll-handle-an: $wrapper-scroll-handle-an_w;
+			--scroll-handle-active: $scroll-handle-active_w;
+			--scroll-handle-scrolling: $scroll-handle-scrolling_w;
+			--scroll-handle-drag: $scroll-handle-drag_w;
+		}
+	}
+
+	.Scroll-area
+	{
+		position: relative;
+		width: 2005%;
+		height: 100%;
+		max-height: inherit;
+		overflow: auto;
+		-webkit-overflow-scroll: touch;
+	}
+
+	.Scroll-content
+	{
+		position: relative;
+		width: 5%;
+		height: 100%;
+		overflow: visible;
+		-moz-box-sizing: border-box;
+		-webkit-box-sizing: border-box;
+		-o-box-sizing: border-box;
+		-ms-box-sizing: border-box;
+		box-sizing: border-box;
+	}
+
+	.Scroll-handle-area
+	{
+		position: absolute;
+		top: 5px;
+		bottom: 5px;
+		right: 2px;
+		width: 6px;
+		border-radius: 3px;
+	}
+
+	.Scroll-overlay-box
+	{
+		background-color: var( --overlay-box );
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 100%;
+		width: 5%;
+		text-align: center;
+		opacity: 0;
+		transition: opacity ease-in-out;
+		transition-duration: 0.8s;
+
+		&:before
+		{
+			content: '';
+			display: inline-block;
+			height: 100%;
+			vertical-align: middle;
+			margin-right: -0.25em;
+		}
+
+		.Scroll-overlay-text
+		{
+			position: relative;
+			display: inline-block;
+			vertical-align: middle;
+			text-align: center;
+			font-size: 22px;
+			line-height: 30px;
+			-moz-user-select: none;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+			cursor: defualt;
+			font-weight: 400;
+			color: #fff;
+		}
+	}
+
+	.Scroll-overlay
+	{
+		overflow: hidden;
+
+		.Scroll-overlay-box
+		{
+			opacity: 1;
+		}
+
+	}
+
+	.Scroll-handle
+	{
+		position: absolute;
+		top: 20px;
+		left: 0px;
+		height: 0px;
+		width: 6px;
+		cursor: pointer;
+		background: var( --scroll-handle );
+		border-radius: 3px;
+		-moz-transition: background 250ms ease-in-out 100ms;
+		-webkit-transition: background 250ms ease-in-out 100ms;
+		-o-transition: background 250ms ease-in-out 100ms;
+		transition: background 250ms ease-in-out 100ms;
+	}
+
+	.Scroll-wrapper:hover>.Scroll-handle-area.active>.Scroll-handle
+	{
+		background:var( --wrapper-scroll-handle-bg );
+		animation: var( --wrapper-scroll-handle-an ) 2000ms;
+		-webkit-animation: var( --wrapper-scroll-handle-an ) 2000ms;
+	}
+
+	.Scroll-handle-area.inactive
+	{
+		display:none;
+	}
+
+	.Scroll-wrapper>.Scroll-handle-area:hover>.Scroll-handle,
+	.Scroll-wrapper>.Scroll-handle-area.active>.Scroll-handle:hover,
+	.Scroll-wrapper>.Scroll-handle-area.active>.Scroll-handle:active
+	{
+		left: -1px;
+		width: 8px;
+		background:var( --scroll-handle-active );
+	}
+	.Scroll-wrapper>.Scroll-handle-area.active>.Scroll-handle.Scroll-handle-scrolling
+	{
+		background:var( --scroll-handle-scrolling );
+	}
+	.Scroll-wrapper>.Scroll-handle-area.active>.Scroll-handle.Scroll-handle-drag
+	{
+		background:var( --scroll-handle-drag );
+		animation: none;
+		-webkit-animation: none;
+		left: 0;
+		width: 6px;
+	}
+
+
+	@keyframes scrollHandleFadeOut
+	{
+		0%   {background:rgba(115,115,115,0);}
+		40%  {background:rgba(115,115,115,0.25);}
+		85%	 {background:rgba(115,115,115,0.25);}
+		100% {background:rgba(115,115,115,0);}
+	}
+	@keyframes scrollHandleFadeOutWhite
+	{
+		0%   {background:rgba(255,255,255,0);}
+		40%  {background:rgba(255,255,255,0.25);}
+		85%	 {background:rgba(255,255,255,0.25);}
+		100% {background:rgba(255,255,255,0);}
+	}
+
+</style>
+<script>
+	Scroll = new(function()
+	{
+		var self = this;
+		var scrollDraggedHandle = null;
+		var touchScrollInterval = null;
+		var touchScrollArea = null;
+		var scrolledArea = null;
+		var scrolledAreas = { last: null, stops : [], stopTimeout : null };
+
+		function isVisible( element, cache ) // TODO implementovat cache nech furt nepocitam poziciu jednej arei vzhladom na druhu
+		{
+			var top = element.offsetTop - element.scrollTop;
+			var height = element.offsetHeight;
+			var offsetParent = element.offsetParent;
+
+			if( offsetParent )
+			{
+				do
+				{
+					if( element.classList.contains('Scroll-area') )
+					{
+						if( top + height < element.scrollTop - s_lazyload.visibilityOffset || top > element.scrollTop + element.offsetHeight + s_lazyload.visibilityOffset )
+						{
+							return false;
+						}
+					}
+
+					if( offsetParent == element )
+					{
+						top += element.offsetTop - element.scrollTop;
+						offsetParent = element.offsetParent;
+					}
+				}
+				while( element = element.parentNode );
+			}
+
+			return true;
+		}
+
+		function scrollHandleOnDrag( event )
+		{
+			event = event ? event : window.event;
+
+			var scrollArea = scrolledArea;
+
+			if(typeof scrollArea == 'undefined'){ return; }
+			var scrollHandleArea = scrollDraggedHandle.parentNode;
+			var scrollHandle = scrollHandleArea.firstChild;
+			var scrollTop = ( parseInt(scrollDraggedHandle.style.top) + ( event.clientY - scrollDraggedHandle.mouseY ) ) / scrollHandleArea.offsetHeight * scrollArea.scrollHeight;
+
+			scrollArea.lastScrollTop = scrollArea.scrollTop;
+			scrollArea.scrollTop = scrollTop;
+			scrollHandle.style.top = Math.max(0,Math.min(scrollHandleArea.offsetHeight - scrollHandle.offsetHeight,Math.round(scrollHandleArea.offsetHeight * scrollTop / scrollArea.scrollHeight))) + 'px';
+
+			//if( ( scrollHandle.style.top > 0 ) && ( scrollHandle.style.top < scrollHandleArea.offsetHeight - scrollHandle.offsetHeight ) )
+			{
+				scrollDraggedHandle.mouseY = event.clientY;
+			}
+
+			return false;
+		}
+
+		function scrollHandleOnDragStop()
+		{
+			scrollDraggedHandle.parentNode.parentNode.classList.remove('Drag');
+	        scrollDraggedHandle.className = 'Scroll-handle';
+			scrollDraggedHandle = document.onmouseup = document.onmousemove = null;
+		}
+
+		this.updateAll = function()
+		{
+			var scrolls = document.querySelectorAll('.Scroll-wrapper');
+
+			for( var i = 0; i < scrolls.length; ++i )
+			{
+				var scrollWrapper = scrolls[i];
+
+	            var outerScroll = ( scrollWrapper.hasAttribute('data-outerScroll') && scrollWrapper.getAttribute('data-outerScroll') != '' ) ? scrollWrapper.getAttribute('data-outerScroll') : false;
+	            var scrollArea = scrollWrapper.firstChild;
+	            var scrollHandleArea = ( outerScroll === false ) ? scrollArea.nextSibling : document.getElementById(outerScroll).firstChild;
+
+	            if( scrollArea.offsetHeight < scrollArea.scrollHeight  )
+	            {
+					scrollHandleArea.classList.remove('inactive');
+	            }
+	            else
+	            {
+	                scrollHandleArea.classList.add('inactive');
+	            }
+			}
+
+		}
+
+		this.update = function( scrollWrapper )
+		{
+			if(scrollDraggedHandle != null){ return; }
+
+			var outerScroll = ( scrollWrapper.hasAttribute('data-outerScroll') && scrollWrapper.getAttribute('data-outerScroll') != '' ) ? scrollWrapper.getAttribute('data-outerScroll') : false;
+
+			var scrollArea = scrollWrapper.firstChild;
+			var scrollHandleArea = ( outerScroll === false ) ? scrollArea.nextSibling : document.getElementById(outerScroll).firstChild;
+			var scrollHandle = scrollHandleArea.firstChild;
+
+			scrollHandle.style.height = Math.round(scrollHandleArea.offsetHeight * scrollArea.offsetHeight / scrollArea.scrollHeight) + 'px';
+			scrollHandle.style.top = Math.round(scrollHandleArea.offsetHeight * scrollArea.scrollTop / scrollArea.scrollHeight) + 'px';
+
+			if( outerScroll )
+			{
+				scrolledArea = scrollArea;
+				try{ clearTimeout(scrollHandleArea.hideTimeout); }catch(e){}
+			}
+
+			if( scrollArea.offsetHeight < scrollArea.scrollHeight  )
+			{
+				if( outerScroll !== false ){ scrollHandleArea.parentNode.classList.add('active'); }
+				scrollHandleArea.classList.add('active');
+	            scrollHandleArea.classList.remove('inactive');
+			}
+			else
+			{
+				if( outerScroll !== false ){ scrollHandleArea.parentNode.classList.remove('active'); }
+				scrollHandleArea.classList.add('inactive');
+			}
+		}
+
+		this.leave = function( scrollWrapper )
+		{
+			var outerScroll = ( scrollWrapper.hasAttribute('data-outerScroll') && scrollWrapper.getAttribute('data-outerScroll') != '' )  ? scrollWrapper.getAttribute('data-outerScroll') : false;
+
+			if( outerScroll )
+			{
+				var scrollHandleArea = document.getElementById(outerScroll).firstChild;
+
+				scrollHandleArea.hideTimeout = setTimeout(function(){ scrollHandleArea.parentNode.classList.remove('active'); }, 500);
+			}
+		}
+
+		function stickyScroll( scrollArea, event )
+		{
+			var sticky = scrollArea.querySelector('[data-sticky]');
+
+			if( sticky )
+			{
+				var stickyStyles = sticky.getAttribute('data-sticky').split(';');
+				var stickyAttributes = {};
+				for( var i = 0; i < stickyStyles.length; ++i )
+				{
+					if( stickyStyles[i].indexOf(':') > -1  )
+					{
+						var attribute = stickyStyles[i].split(':');
+						stickyAttributes[attribute[0].trim().toLowerCase()] = parseInt(attribute[1].trim());
+					}
+				}
+
+				if( event == 'start' )
+				{
+					var areaPosition = scrollArea.parentNode.viewportPosition();
+
+					if( typeof stickyAttributes.top != 'undefined' )
+					{
+						sticky.style.top = (areaPosition.y + stickyAttributes.top) + 'px';
+						sticky.style.bottom = 'auto';
+					}
+					else
+					{
+						sticky.style.top = (areaPosition.y + scrollArea.parentNode.offsetHeight - stickyAttributes.bottom) + 'px';
+						sticky.style.bottom = 'auto';
+					}
+
+					if( typeof stickyAttributes.left != 'undefined' )
+					{
+						sticky.style.left = (areaPosition.x + stickyAttributes.left) + 'px';
+						sticky.style.right = 'auto';
+					}
+					else
+					{
+						sticky.style.left = (areaPosition.x + scrollArea.parentNode.offsetWidth - stickyAttributes.right - sticky.offsetWidth ) + 'px';
+						sticky.style.right = 'auto';
+					}
+
+					sticky.style.position = 'fixed';
+				}
+				else if( event == 'stop' )
+				{
+					var areaPosition = scrollArea.parentNode.viewportPosition();
+
+					if( typeof stickyAttributes.top != 'undefined' )
+					{
+						sticky.style.top = ( stickyAttributes.top + scrollArea.scrollTop ) + 'px';
+						sticky.style.bottom = 'auto';
+					}
+					else
+					{
+						sticky.style.bottom = stickyAttributes.bottom + 'px';
+						sticky.style.top = 'auto';
+					}
+
+					if( typeof stickyAttributes.left != 'undefined' )
+					{
+						sticky.style.left = ( stickyAttributes.left + scrollArea.scrollLeft ) + 'px';
+						sticky.style.right = 'auto';
+					}
+					else
+					{
+						sticky.style.right = stickyAttributes.right + 'px';
+						sticky.style.left = 'auto';
+					}
+
+					sticky.style.position = 'absolute';
+				}
+			}
+		}
+
+		function onScrollStart( scrollArea )
+		{
+			//console.log('onscrollstart');
+
+			stickyScroll( scrollArea, 'start' );
+		}
+
+		function onScrollStop( scrollArea )
+		{
+			//console.log('onscrollstop');
+
+			stickyScroll( scrollArea, 'stop' );
+
+
+	        var outerScroll = ( scrollArea.parentNode.hasAttribute('data-outerScroll') && scrollArea.parentNode.getAttribute('data-outerScroll') != '' ) ? scrollArea.parentNode.getAttribute('data-outerScroll') : false;
+	        var scrollHandleArea = ( outerScroll === false ) ? scrollArea.nextSibling : document.getElementById(outerScroll).firstChild;
+	        var scrollHandle = scrollHandleArea.firstChild;
+
+	        scrollHandle.className = scrollHandle.className.replace( 'Scroll-handle-scrolling', '' ).trim();
+			scrollArea.className = scrollArea.className.replace( 'Scroll-scrolling', '' ).trim();
+		}
+
+		function areaStopTimeout( scrollArea )
+		{
+			for( var i = 0; i < scrolledAreas.stops.length; ++i )
+			{
+				if( scrolledAreas.stops[i].area == scrollArea )
+				{
+					scrolledAreas.stops.splice(i,1);
+				}
+			}
+		}
+
+		function updateStopTimeout( scrollArea )
+		{
+			for( var i = 0; i < scrolledAreas.stops.length; ++i )
+			{
+				if( scrolledAreas.stops[i].area == scrollArea )
+				{
+					clearTimeout(scrolledAreas.stops[i].timeout);
+					scrolledAreas.stops[i].timeout = window.setTimeout( function()
+					{
+						areaStopTimeout( scrollArea );
+						onScrollStop( scrollArea );
+					}, 250);
+
+					return;
+				}
+			}
+
+			scrolledAreas.stops.push( { area: scrollArea, timeout: window.setTimeout( function()
+			{
+				areaStopTimeout( scrollArea );
+				onScrollStop( scrollArea );
+			}, 250)});
+
+			onScrollStart( scrollArea );
+		}
+
+		this.scroll = function( scrollArea )
+		{
+			updateStopTimeout( scrollArea );
+
+			if( scrollArea.scrollLeft > 0 ){ scrollArea.scrollLeft = 0; }
+			if	( scrollArea.parentNode.scrollLeft > 0 ){ scrollArea.parentNode.scrollLeft = 0; }
+
+			//if( window.touschScrollDebug == true ){ alert(scrollDraggedHandle.toSource()); }
+			if( scrollDraggedHandle != null ) return;
+
+			var outerScroll = ( scrollArea.parentNode.hasAttribute('data-outerScroll') && scrollArea.parentNode.getAttribute('data-outerScroll') != '' ) ? scrollArea.parentNode.getAttribute('data-outerScroll') : false;
+
+			var scrollHandleArea = ( outerScroll === false ) ? scrollArea.nextSibling : document.getElementById(outerScroll).firstChild;
+			var scrollHandle = scrollHandleArea.firstChild;
+
+			scrollHandle.style.height = Math.round(scrollHandleArea.offsetHeight * scrollArea.offsetHeight / scrollArea.scrollHeight) + 'px';
+			scrollHandle.style.top = Math.round(scrollHandleArea.offsetHeight * scrollArea.scrollTop / scrollArea.scrollHeight) + 'px';
+			scrollHandle.className = 'Scroll-handle Scroll-handle-scrolling';
+			scrollArea.lastScrollTop = scrollArea.scrollTop;
+			scrollArea.classList.add( 'Scroll-scrolling' );
+
+		}
+
+		function getOS()
+		{
+			var osName = 'unknown';
+			if( navigator.appVersion.indexOf( 'Win' ) !== -1 ){ osName = 'windows'; }
+			if( navigator.appVersion.indexOf( 'Mac' ) !== -1 ){ osName = 'osx'; }
+			if( navigator.appVersion.indexOf( 'X11' ) !== -1 ){ osName = 'unix'; }
+			if( navigator.appVersion.indexOf( 'Linux' ) !== -1 ){ osName = 'linux'; }
+
+			return osName;
+		}
+
+		this.wheel = function( element, event )
+		{
+			window.clearTimeout( element._timers );
+			delete element._timers;
+
+			var overlayBox = element.querySelector('.Scroll-overlay-box');
+			if( ( event.ctrlKey && [ 'linux', 'windows', 'unix' ].indexOf( getOS() ) > -1 ) || ( event.metaKey && [ 'osx' ].indexOf( getOS() ) > -1 ) )
+			{
+				event.preventDefault();
+				if( overlayBox ){ overlayBox.remove(); }
+				element.scrollTop += event.deltaY * 10;
+				return false;
+			}
+			else if( [ 'linux', 'windows', 'osx', 'unix' ].indexOf( getOS() ) )
+			{
+				if( ( element.scrollHeight - element.scrollTop !== element.clientHeight ) || element.scrollTop > 0 )
+				{
+					element.classList.add('Scroll-overlay');
+
+					if( !overlayBox )
+					{
+						overlayBox = document.createElement('div');
+						overlayBox.className = 'Scroll-overlay-box';
+						overlayBox.innerHTML = '<div class="Scroll-overlay-text">Use '+( getOS() === 'osx' ? '⌘' : 'ctrl' )+' + scroll to scroll</div>';
+						element.appendChild( overlayBox );
+					}
+					overlayBox.style.top = element.scrollTop+'px';
+					element._timers = setTimeout( function(){ setTimeout( function(){  if( overlayBox ){ overlayBox.remove(); } }, 850 ) }, 1000  );
+				}
+			}
+
+			return true;
+		}
+
+		this.page = function( scrollArea )
+		{
+			var status = scrollArea.getAttribute('data-status');
+
+			if( status == 'disabled' )
+			{
+				return;
+			}
+			else if( status == 'init' )
+			{
+				scrollArea.setAttribute('data-status','');
+				return;
+			}
+
+			var scrollContent = scrollArea.firstChild;
+			var scrollHandleArea = scrollArea.nextSibling;
+			var direction = (scrollArea.lastScrollTop < scrollArea.scrollTop) ? 'NEXT' : 'PREV';
+			var blocks = scrollContent.childrenSelector('.scroll-block');
+			var blockNo = ( direction == 'PREV' ) ? 0 : blocks.length - 1;
+			var position = scrollArea.scrollTop;
+
+			if( ( scrollArea.getAttribute('data-status') != 'loading' ) && ( ( parseInt(scrollArea.scrollHeight) - parseInt(scrollArea.scrollTop) - parseInt(scrollHandleArea.offsetHeight) < 500 && direction == 'NEXT' ) ) )
+			{
+				var data 		= { direction : direction , block : blocks[blockNo].getAttribute( 'data-block' ) };
+				var url 		= scrollArea.getAttribute('data-URL');
+				var namespaces 	= scrollArea.getAttribute('data-SCOPE').split('.');
+
+				scrollArea.setAttribute('data-status','loading');
+
+				Network.load( url, data, function( result )
+				{
+					var scope = window;
+					for( var n = 0, cnt_n = namespaces.length; n < cnt_n; ++n ){ scope = scope[ namespaces[n] ]; }
+
+					result = JSON.parse( result );
+					if( typeof result != 'undefinded' )
+					{
+						scope( result );
+					}
+
+					setTimeout( function()
+					{
+						scrollArea = document.querySelector( 'div.Scroll-area[data-url="'+scrollArea.getAttribute('data-url')+'"]' );
+
+						self.scrollTo( scrollArea, position );
+						scrollArea.setAttribute('data-status','pending');
+					}, 250)
+				} );
+			}
+		}
+
+		this.scrollTo = function( scrollArea, position, speed )
+		{
+			if( typeof speed == 'undefined' )
+			{
+				scrollArea.scrollTop = position;
+			}
+			Scroll.update(scrollArea.parentNode);
+		}
+
+		this.drag = function( event )
+		{
+			event = event ? event : window.event;
+
+			scrollDraggedHandle = event.currentTarget;
+			scrollDraggedHandle.mouseY = event.clientY;
+
+			if(!scrollDraggedHandle.parentNode.parentNode.classList.contains('OuterScroll')){
+				scrolledArea = scrollDraggedHandle.parentNode.previousSibling;
+			}else{
+				scrollDraggedHandle.parentNode.parentNode.classList.add('Drag');
+			}
+
+	        scrollDraggedHandle.className = 'Scroll-handle Scroll-handle-drag';
+
+			document.onmousemove = scrollHandleOnDrag;
+			document.onmouseup = scrollHandleOnDragStop;
+
+			stopPropagation( event );
+
+			return true;
+		}
+
+		this.click = function( event )
+		{
+			event = event ? event : window.event;
+
+			var scrollHandleArea = event.currentTarget;
+			var scrollHandle = scrollHandleArea.firstChild;
+			var scrollArea = scrollHandleArea.parentNode.classList.contains('OuterScroll') ? scrolledArea : scrollHandleArea.parentNode.firstChild;
+			var y = event.layerY;
+
+			if( y <= scrollHandle.offsetTop )
+			{
+				this.scrollTo( scrollArea, scrollArea.scrollTop - scrollArea.offsetHeight, 300 );
+			}
+			else
+			{
+				this.scrollTo( scrollArea, scrollArea.scrollTop + scrollArea.offsetHeight, 300 );
+			}
+		}
+
+		function touchScrollStop()
+		{
+			clearInterval( touchScrollInterval );
+			window.ontouchend = touchScrollArea = touchScrollInterval = null;
+		}
+
+		this.touchScrollStart = function( scrollArea )
+		{
+			touchScrollArea = scrollArea;
+			touchScrollInterval = setInterval(function(){ scrollArea.onscroll(); }, 500);
+			window.ontouchend = touchScrollStop;
+		}
+
+		this.outerHandlerEnter = function(scrollHandleArea){
+			try{ clearTimeout(scrollHandleArea.hideTimeout); }catch(e){}
+		}
+
+		this.outerHandlerLeave = function(scrollHandleArea){
+			scrollHandleArea.hideTimeout = setTimeout(function(){ scrollHandleArea.parentNode.classList.remove('active'); }, 500);
+		}
+
+		var bodyScrollCache = { element : null, scrollArea : null };
+
+		function bodyScroll( event )
+		{
+			var originalTarget = event.srcElement || event.originalTarget;
+			var element = originalTarget;
+			var scrollArea = null;
+			var scrollAreas = null;
+
+			if( element == bodyScrollCache.element )
+			{
+				if( bodyScrollCache.scrollArea != null )
+				{
+	                scrollArea = bodyScrollCache.scrollArea;
+				}
+				else{ return true; }
+			}
+
+	        scrollArea = ( element == bodyScrollCache.element ) ? bodyScrollCache.scrollArea : ''; // What?
+
+			if( scrollArea == null )
+			{
+				while( element != undefined && element != null )
+				{
+					if( element.classList.contains('Scroll-area') )
+					{
+						bodyScrollCache.element = originalTarget;
+						bodyScrollCache.scrollArea = null;
+
+						return true;
+					}
+					else if( element.id == 'Dialogs' )
+					{
+						var scrollAreas = document.querySelectorAll('#Dialogs .Dialog');
+
+						if( scrollAreas.length > 0 )
+						{
+							scrollAreas = scrollAreas[scrollAreas.length-1].querySelectorAll('.Scroll-wrapper');
+						}
+
+						break;
+					}
+
+					element = element.parentNode;
+				}
+			}
+
+			if( scrollAreas === null ){ scrollAreas = document.querySelectorAll('.Window .Scroll-wrapper'); }
+
+			if( scrollAreas.length == 0 )
+			{
+				return;
+			}
+			else if( scrollAreas.length == 1 )
+			{
+				scrollArea = scrollAreas[0].firstChild;
+			}
+			else
+			{
+				var closestDistance = 10000000;
+
+				for( var i = 0; i < scrollAreas.length; ++i )
+				{
+					var position = scrollAreas[i].viewportPosition();
+					var distance = ( position.x > event.pageX ) ? ( position.x - event.pageX ) : ( ( position.x + scrollAreas[i].offsetWidth < event.pageX ) ? ( event.pageX - position.x - scrollAreas[i].offsetWidth ) : 0 );
+
+					if( closestDistance > distance )
+					{
+						closestDistance = distance;
+						scrollArea = scrollAreas[i].firstChild;
+					}
+				}
+			}
+
+			var scrollAmount = ( event.detail || ( -event.wheelDelta / 40 ) ) * 19;
+
+			if( !( event.wheelDeltaX || ('axis' in event && 'HORIZONTAL_AXIS' in event && event.axis == event.HORIZONTAL_AXIS)) )
+			{
+				( scrollArea.scrollBy ) ? scrollArea.scrollBy(0, scrollAmount) : ( scrollArea.scrollTop += scrollAmount );
+			}
+
+			stopPropagation(event);
+			return false;
+		}
+
+	    this.infinite = function( scrollArea, scrollWrapper )
+	    {
+	        var scrollContent = ( typeof scrollWrapper == 'undefined' || !( scrollWrapper ) ) ? scrollArea.firstChild : scrollArea.querySelector(scrollWrapper);
+	        var scrollHandleArea = scrollArea.nextSibling;
+	        var direction = (scrollArea.lastScrollTop <= scrollArea.scrollTop) ? 'NEXT' : 'PREV';
+
+	        //dole
+	        if( ( scrollArea.getAttribute('data-status') != 'loading' ) && ( ( parseInt(scrollArea.scrollHeight) - parseInt(scrollArea.scrollTop) - parseInt(scrollHandleArea.offsetHeight) < 500 && direction == 'NEXT' ) || ( parseInt(scrollArea.scrollTop) < 500 && direction == 'PREV' ) ) )
+	        {
+	            var blocks = scrollContent.childrenSelector('.Scroll-infinite-block');
+	            var blockNo = ( direction == 'PREV' ) ? 0 : blocks.length - 1;
+
+
+	            var blockID = blocks[blockNo].getAttribute('data-blockID');
+	            var callback = executeFunctionByName( blocks[blockNo].getAttribute('data-callback'), window );
+	            var maxLimit = 500000;
+
+	            if( blocks.length > maxLimit )
+	            {
+	                var blockDeleteNo = ( direction == 'PREV' ) ? blocks.length - 1 : 0;
+	                scrollArea.scrollTop = scrollArea.scrollTop - blocks[blockDeleteNo].offsetHeight;
+	                blocks[blockDeleteNo].parentNode.removeChild(blocks[blockDeleteNo]);
+	            }
+
+	            scrollArea.setAttribute('data-status','loading');
+
+	            callback( scrollContent, direction, blockID, function()
+				{
+	                scrollArea.setAttribute('data-status','pending');
+	                Scroll.update(scrollArea.parentNode);
+				} );
+	        }
+	    }
+
+	    function executeFunctionByName(functionName, context ) {
+	        var namespaces = functionName.split(".");
+	        var func = namespaces.pop();
+	        for(var i = 0; i < namespaces.length; i++) { context = context[namespaces[i]]; }
+	        return context[func];
+	    }
+
+		function stopPropagation( event )
+		{
+			event = ( event ) ? event : window.event;
+
+			if( event.preventDefault){ event.preventDefault(); } else { window.event.returnValue = false; }
+
+			if( 'bubbles' in event ) // all browsers except IE before version 9
+			{
+				if( event.bubbles ) event.stopPropagation();
+			}
+			else event.cancelBubble = true; // Internet Explorer before version 9
+		}
+
+	})();
+
+</script>
+<div class={ 'Scroll-wrapper'+( typeof color !== 'undefined' ? ' '+color : '' ) } style={ ( typeof outer_padding !== 'undefined' ? 'padding:'+outer_padding+';' : '' ) } onmouseover="Scroll.update(this)">
+	<div class="Scroll-area" onscroll="Scroll.scroll(this)">
+		<div class="Scroll-content" style={ ( typeof inner_padding !== 'undefined' ? 'padding:'+inner_padding+';' : '' ) }>
+			{CONTENT}
+		</div>
+	</div>
+	<div class="Scroll-handle-area"><div class="Scroll-handle" style="top:0px" onmousedown="return Scroll.drag(event);"></div></div>
+</div>

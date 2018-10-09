@@ -7,14 +7,14 @@
 @no_select{ -moz-user-select: none; -webkit-user-select: none; -ms-user-select: none; user-select: none; cursor: defualt; }
 @border-box{ -moz-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; }
 
-@form_border{ border: 1px solid #999; }
+@form_border{ border: 1px solid #525666; }
 @form_border_radius{ border-radius: 0; }
-$form_background_color: #fff;
-$form_color: #999;
-$form_color_fill: #1a1a1a;
+$form_background_color: #242838;
+$form_color: #c1c4ce;
+$form_color_fill: #c1c4ce;
 
-$form_label_color: #999;
-$form_label_fill_color: #1a1a1a;
+$form_label_color: #646776;
+$form_label_fill_color: #8f94a6;
 
 $form_option_color: #fff;
 $form_option_fill_color: #fff;

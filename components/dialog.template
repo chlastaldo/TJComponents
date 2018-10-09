@@ -1,0 +1,623 @@
+<style>
+#alert
+{
+	position: absolute;
+	&.top{ top: 10px; }
+	&.bottom{ bottom: 10px; }
+	&.left{ left: 10px; }
+	&.right{ right: 10px; }
+
+	&.bottom
+	{
+		.alert
+		{
+			&.created
+			{
+				-ms-transform: translateY(24px);
+				-moz-transform: translateY(24px);
+				-webkit-transform: translateY(24px);
+				transform: translateY(24px);
+			}
+		}
+	}
+	.alert
+	{
+		position: relative;
+		width: 300px;
+		text-align: left;
+		margin-bottom: 2px;
+		border-radius: 3px;
+		overflow: hidden;
+
+		-ms-transform: translateY(0px);
+		-moz-transform: translateY(0px);
+		-webkit-transform: translateY(0px);
+		transform: translateY(0px);
+		opacity: 1;
+
+		-ms-transition: all 600ms cubic-bezier(0.23, 1, 0.32, 1);
+		-moz-transition: all 600ms cubic-bezier(0.23, 1, 0.32, 1);
+		-webkit-transition: all 600ms cubic-bezier(0.23, 1, 0.32, 1);
+		transition: all 600ms cubic-bezier(0.23, 1, 0.32, 1);
+
+		z-index: 999;
+
+		&.created
+		{
+			-ms-transition: none;
+			-moz-transition: none;
+			-webkit-transition: none;
+			transition: none;
+
+			-ms-transform: translateY(-24px);
+			-moz-transform: translateY(-24px);
+			-webkit-transform: translateY(-24px);
+			transform: translateY(-24px);
+			opacity: 0;
+
+
+		}
+		&.destroyed
+		{
+			-ms-transition: all 300ms cubic-bezier(0.755, 0.05, 0.855, 0.06);
+			-moz-transition: all 300ms cubic-bezier(0.755, 0.05, 0.855, 0.06);
+			-webkit-transition: all 300ms cubic-bezier(0.755, 0.05, 0.855, 0.06);
+			transition: all 300ms cubic-bezier(0.755, 0.05, 0.855, 0.06);
+
+			-ms-transform: translateY(24px);
+			-moz-transform: translateY(24px);
+			-webkit-transform: translateY(24px);
+			transform: translateY(24px);
+			opacity: 0;
+		}
+		&:after
+		{
+			content: "";
+			font-family: 'Font Awesome 5 Free';font-weight: 900; font-size: 16px;
+			line-height: 38px;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			width: 30px;
+			position: absolute;
+			text-align: center;
+
+			content: var(--after_content);
+			color: var(--after_color);
+			background-color: var(--after_background_color);
+		}
+		.close
+		{
+			position: absolute;
+			top: 4px;
+			right: 4px;
+			width: 12px;
+			height: 12px;
+			line-height: 10px;
+			text-align: center;
+			cursor: pointer;
+			&:after
+			{
+				content: "\f00d";
+				font-family: 'Font Awesome 5 Free';font-weight: 900; font-size: 12px;
+				color: rgba( 84, 84, 84, 0.45);
+			}
+			&:hover
+			{
+				&:after
+				{
+					color: rgba( 84, 84, 84, 0.75);
+				}
+			}
+		}
+		.header
+		{
+			padding: 8px 10px 8px 40px;
+			line-height: 22px;
+			font-size: 14px;
+			-moz-user-select: none; -webkit-user-select: none; -ms-user-select: none; user-select: none; cursor: defualt;
+
+			color: var( --header_color );
+			background-color: var( --header_background_color );
+		}
+		.message
+		{
+			padding: 8px 8px 8px 38px;
+			font-size: 13px;
+			-moz-user-select: none; -webkit-user-select: none; -ms-user-select: none; user-select: none; cursor: defualt;
+
+			color: var( --message_color );
+			background-color: var( --message_background_color );
+		}
+
+		.header + .message
+		{
+			border-top: 1px solid var(--header_message);
+		}
+
+		&.info
+		{
+			--after_content: '\f05a';
+			--after_color: #99ccf7;
+			--after_background_color: #0d82e6;
+			--header_color: #1a4386;
+			--header_background_color: #68b2f4;
+			--header_message: #3496ec;
+			--message_color: #1a4386;
+			--message_background_color: #7ebef7;
+		}
+
+		&.ok
+		{
+			--after_content: '\f00c';
+			--after_color: #9ee5ad;
+			--after_background_color: #2ba143;
+			--header_color: #1f5130;
+			--header_background_color: #64cf79;
+			--header_message: #67c57a;
+			--message_color: #1f5130;
+			--message_background_color: #72da87;
+		}
+
+		&.error
+		{
+			--after_content: '\f071';
+			--after_color: #f5c2c2;
+			--after_background_color: #d92626;
+			--header_color: #7a1200;
+			--header_background_color: #ec9393;
+			--header_message: #d48484;
+			--message_color: #7a1200;
+			--message_background_color: #f1b2b2;
+		}
+	}
+}
+
+$overlay_background: rgba(8,9,10, 0.75);
+$dialog_shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.4);
+$dialog_color: #9da5b4;
+$dialog_radius: 6px;
+$dialog_background: #252830;
+$dialog_border: 1px solid #181a1f;
+
+$overlay_background_w: rgba(8,9,10, 0.55);
+$dialog_shadow_w: 0 6px 12px -2px rgba(0, 0, 0, 0.4);
+$dialog_color_w: #1a1a1a;
+$dialog_radius_w: 6px;
+$dialog_background_w: #fff;
+$dialog_border_w: 1px solid #ccc;
+
+:root
+{
+	--overlay_background: $overlay_background;
+	--dialog_shadow : $dialog_shadow;
+	--dialog_color : $dialog_color;
+	--dialog_radius : $dialog_radius;
+	--dialog_background : $dialog_background;
+	--dialog_border : $dialog_border;
+}
+body.white
+{
+	--overlay_background: $overlay_background_w;
+	--dialog_shadow : $dialog_shadow_w;
+	--dialog_color : $dialog_color_w;
+	--dialog_radius : $dialog_radius_w;
+	--dialog_background : $dialog_background_w;
+	--dialog_border : $dialog_border_w;
+}
+#popup-overlay
+{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	white-space: nowrap;
+	background: var( --overlay_background );
+	overflow: auto;
+	z-index: 998;
+
+	&:before
+	{
+		content: '';
+		display: inline-block;
+		height: 100%;
+		vertical-align: middle;
+		margin-right: -0.25em;
+	}
+	&.fullHeight
+	{
+		#popup{ height: calc( 100% - 22px);width: 1080px; padding: 0; }
+		.popup-header{ margin: 0 !important;}
+	}
+
+	#popup
+	{
+		text-align: left;
+		display: inline-block;
+		vertical-align: middle;
+		padding: 20px;
+		width: 700px;
+		position: relative;
+		box-shadow: var( --dialog_shadow );
+		color: var( --dialog_color );
+		border-radius: var( --dialog_radius );
+		background-color: var( --dialog_background );
+
+		-ms-transform: translateY(0px);
+		-moz-transform: translateY(0px);
+		-webkit-transform: translateY(0px);
+		transform: translateY(0px);
+		opacity: 1;
+
+		-ms-transition: all 600ms cubic-bezier(0.23, 1, 0.32, 1);
+		-moz-transition: all 600ms cubic-bezier(0.23, 1, 0.32, 1);
+		-webkit-transition: all 600ms cubic-bezier(0.23, 1, 0.32, 1);
+		transition: all 600ms cubic-bezier(0.23, 1, 0.32, 1);
+
+		white-space: normal;
+		margin: 10px;
+		&.popup-headers
+		{
+			padding: 0 20px 20px 20px;
+
+			.popup-header
+			{
+				padding: 10px 20px;
+				position: relative;
+				border-bottom: var( --dialog_border );
+				margin-bottom: 15px;
+				margin-left: -20px;
+				margin-right: -20px;
+				@bold_font;
+				font-size: 20px;
+				height: 24px;
+				line-height: 24px;
+
+				.popup-close
+				{
+					position: absolute;
+					top: 0;
+					right: 0;
+					height: 38px;
+					line-height: 38px;
+					width: 38px;
+					text-align: center;
+					cursor: pointer;
+					&:hover
+					{
+						&:after
+						{
+							color: red;
+						}
+					}
+					&:after
+					{
+						content: "\f00d";
+						height: 38px;
+						line-height: 38px;
+						width: 38px;
+						text-align: center;
+						font: normal normal normal 18px/1 FontAwesome;
+						color: inherit;
+					}
+				}
+			}
+		}
+		&.created
+		{
+			-ms-transition: none;
+			-moz-transition: none;
+			-webkit-transition: none;
+			transition: none;
+
+			-ms-transform: translateY(-24px);
+			-moz-transform: translateY(-24px);
+			-webkit-transform: translateY(-24px);
+			transform: translateY(-24px);
+			opacity: 0;
+		}
+		&.destroyed
+		{
+			-ms-transition: all 300ms cubic-bezier(0.755, 0.05, 0.855, 0.06);
+			-moz-transition: all 300ms cubic-bezier(0.755, 0.05, 0.855, 0.06);
+			-webkit-transition: all 300ms cubic-bezier(0.755, 0.05, 0.855, 0.06);
+			transition: all 300ms cubic-bezier(0.755, 0.05, 0.855, 0.06);
+
+			-ms-transform: translateY(24px);
+			-moz-transform: translateY(24px);
+			-webkit-transform: translateY(24px);
+			transform: translateY(24px);
+			opacity: 0;
+		}
+
+		.popup-content-form
+		{
+			position: absolute;
+			top: 55px;
+			left: 20px;
+			right: 20px;
+			bottom: 62px;
+		}
+		.popup-footer
+		{
+			position: absolute;
+			left: 20px;
+			right: 20px;
+			bottom: 0;
+			height: 62px;
+		}
+
+	}
+
+}
+
+#dialog
+{
+	position: fixed;
+	top: -32px;
+	left: -32px;
+	right: -32px;
+	bottom: -32px;
+	text-align: center;
+
+	background: var( --overlay_background );
+
+	-ms-transform: translateY(0px);
+	-moz-transform: translateY(0px);
+	-webkit-transform: translateY(0px);
+	transform: translateY(0px);
+	opacity: 1;
+
+	-ms-transition: all 600ms cubic-bezier(0.23, 1, 0.32, 1);
+	-moz-transition: all 600ms cubic-bezier(0.23, 1, 0.32, 1);
+	-webkit-transition: all 600ms cubic-bezier(0.23, 1, 0.32, 1);
+	transition: all 600ms cubic-bezier(0.23, 1, 0.32, 1);
+
+	white-space: normal;
+	z-index: 999;
+
+	&.created
+	{
+		-ms-transition: none;
+		-moz-transition: none;
+		-webkit-transition: none;
+		transition: none;
+
+		-ms-transform: translateY(-24px);
+		-moz-transform: translateY(-24px);
+		-webkit-transform: translateY(-24px);
+		transform: translateY(-24px);
+		opacity: 0;
+	}
+	&.destroyed
+	{
+		-ms-transition: all 300ms cubic-bezier(0.755, 0.05, 0.855, 0.06);
+		-moz-transition: all 300ms cubic-bezier(0.755, 0.05, 0.855, 0.06);
+		-webkit-transition: all 300ms cubic-bezier(0.755, 0.05, 0.855, 0.06);
+		transition: all 300ms cubic-bezier(0.755, 0.05, 0.855, 0.06);
+
+		-ms-transform: translateY(24px);
+		-moz-transform: translateY(24px);
+		-webkit-transform: translateY(24px);
+		transform: translateY(24px);
+		opacity: 0;
+	}
+
+	&:before { content: ''; display: inline-block; height: 100%; vertical-align: middle; margin-right: -0.25em; }
+
+	.content
+	{
+		position: relative;
+		display: inline-block;
+		vertical-align: middle;
+		width: 300px;
+		padding: 40px;
+		background: var( --dialog_background );
+		color: var( --dialog_color );
+		box-shadow: var( --dialog_shadow );
+		border-radius: var( --dialog_radius );
+		overflow: hidden;
+	}
+
+	.message{ text-align: center; font-size: 14px; }
+
+	.confirm
+	{
+		position: relative;
+		margin-top: 40px;
+		height:36px;
+		display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		justify-content: space-between;
+		align-items: flex-start;
+		align-content: flex-start;
+
+		.button
+		{
+			-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+			-moz-user-select: none; -webkit-user-select: none; -ms-user-select: none; user-select: none;
+			cursor: pointer;
+			display: inline-block;
+			position: relative;
+			vertical-align: top;
+			text-align: center;
+			border-radius: 3px;
+			height:34px; line-height: 32px;
+			width: 128px;
+			font-size: 12px;
+			padding: 0 10px;
+			font-weight: 600;
+
+			&.red{ background-color: #F44336; border-color: #F44336; color: #fff; }
+			&.red{ &:hover{ background-color: #F44336; border-color: #F44336; color: #fff; } }
+
+			&.green{ background-color: #4CAF50; border-color: #4CAF50; color: #fff; }
+			&.green{ &:hover{ background-color: #4CAF50; border-color: #4CAF50; color: #fff; } }
+		}
+	}
+}
+
+</style>
+<script>
+var UI_Dialogs = new( function()
+{
+	this.alert = function( type, header, message = '', options = {} )
+	{
+		var alerts = document.getElementById('alert');
+
+		if( !alerts )
+		{
+			alerts = document.createElement('div');
+			alerts.id = 'alert';
+			alerts.className = ( options.x ? options.x : 'right' )+' '+( options.y ? options.y : 'bottom' );
+			document.body.appendChild(alerts);
+		}
+
+		var alert = document.createElement('div');
+			alert.className = 'created alert '+type;
+			alert.innerHTML = ( header != '' ? '<div class="header">'+header+'</div>' : '' )+
+							  ( message != '' ? '<div class="message">'+message+'</div>' : '' )+
+							  '<div class="close"></div>';
+			alert.querySelector('.close').onclick = function(){ hideAlert( alert ); }
+		  alerts.appendChild(alert);
+		  setTimeout(function(){  hideAlert( alert ); }, Math.min(60000, options.timeout ? options.timeout : 3000 ));
+		  setTimeout(function(){ alert.removeClass('created'); }, 50);
+
+	}
+
+	function hideAlert( alert )
+	{
+		if( alert && document.body.contains( alert ) && !alert.hasClass('destoyed') )
+		{
+			alert.removeClass('created').addClass('destroyed');
+			setTimeout(function()
+			{
+				if( document.body.contains( alert ) ){ alert.parentNode.removeChild(alert); }
+			}, 350);
+		}
+	}
+
+    function hideDialog( )
+    {
+        var dialog = document.getElementById('dialog');
+        if( dialog && document.body.contains( dialog ) && !dialog.hasClass('destoyed') )
+        {
+            dialog.removeClass('created').addClass('destroyed');
+            setTimeout(function(){ if( document.body.contains( dialog ) ){ document.body.removeChild(dialog); } }, 350);
+        }
+    }
+
+    function showDialog( content, hideCallback )
+    {
+        var dialog = document.getElementById('dialog');
+
+        if( dialog )
+        {
+            hideDialog();
+
+            setTimeout( function(){ showDialog( content, hideCallback ); } , 450);
+        }
+        else
+        {
+            dialog = document.createElement('div');
+            dialog.id = 'dialog';
+            dialog.className = 'created';
+            dialog.onclick = function()
+            {
+                hideDialog();
+
+                if( hideCallback ){ hideCallback(); }
+            }
+
+            if( typeof content == 'string' )
+            {
+                dialog.innerHTML = content;
+            }
+            else
+            {
+                dialog.appendChild(content);
+            }
+
+            document.body.appendChild(dialog);
+			DOM_execute( dialog );
+
+            setTimeout(function(){ dialog.removeClass('created'); }, 50);
+        }
+    }
+
+    this.confirm = function( message, callback, options )
+    {
+		options = ( typeof options === 'undefined' ? {} : options );
+        var content = document.createElement('div');
+        content.className = 'content';
+        content.setAttribute('onclick', 'DOM_stopPropagation(event);');
+
+        var title = document.createElement('div');
+        title.className = 'message';
+        title.innerHTML = message;
+
+        var buttons = document.createElement('div');
+        buttons.className = 'confirm';
+
+        var cancel = document.createElement('div');
+        cancel.className = 'button '+( options.cancel_clazz ? options.cancel_clazz : 'red' );
+        cancel.innerHTML = ( options.cancel ? options.cancel : 'Cancel' );
+        cancel.onclick = function(){ hideDialog(); callback(false); }
+
+        var confirm = document.createElement('div');
+        confirm.className = 'button '+( options.yes_clazz ? options.yes_clazz : 'green' );
+        confirm.innerHTML = ( options.yes ? options.yes : 'Yes' );
+        confirm.onclick = function(){ hideDialog(); callback(true); }
+
+        buttons.appendChild(cancel);
+        buttons.appendChild(confirm);
+
+        content.appendChild(title);
+        content.appendChild(buttons);
+
+        showDialog( content, function(){ callback(false); } );
+    }
+
+    this.popup = function( content, options )
+    {
+        options = ( typeof options != 'undefined' ? options : {} );
+        if( document.getElementById('popup-overlay') ){ document.getElementById('popup-overlay').remove(); }
+
+        var html_content = '';
+        var overlay = document.createElement('div');
+            overlay.id = 'popup-overlay';
+        if( typeof options.clazz != 'undefined' && options.clazz ){ overlay.className = options.clazz; }
+
+        if( typeof options.header != 'undefined' )
+        {
+            html_content += '<div class="popup-header">'+options.header+'</div>';
+        }
+
+        html_content += content;
+        overlay.innerHTML = '<div id="popup" class="created'+( ( typeof options.header != 'undefined' )?( ' popup-headers' ):( '' ) )+'" style="'+( options.hasOwnProperty('style') ? options.style : '' )+'">'+html_content+'</div>';
+        document.body.appendChild(overlay);
+
+		DOM_execute( overlay );
+
+        setTimeout(function(){ document.getElementById('popup').removeClass('created'); }, 50);
+    }
+
+	this.forceClosePopup = function()
+	{
+		document.getElementById('popup').removeClass('created').addClass('destroyed');
+
+		if( document.getElementById('popup-overlay') ){ document.getElementById('popup-overlay').remove(); }
+	}
+
+    this.closePopup = function()
+    {
+        document.getElementById('popup').removeClass('created').addClass('destroyed');
+
+        setTimeout(function(){ if( document.getElementById('popup-overlay') ){ document.getElementById('popup-overlay').remove(); } }, 350);
+    }
+})();
+
+</script>

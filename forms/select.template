@@ -1,4 +1,4 @@
-<style require="/style/form.style">
+<style require="form.style">
 .input-select
 {
     @form_border;

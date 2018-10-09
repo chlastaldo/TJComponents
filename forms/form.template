@@ -16,10 +16,6 @@
 					{
 						input.disabled = false;
 						input.parentNode.classList.remove('disabled');
-						if( input.tagName === 'TEXTAREA' && ( input.parentNode.getAttribute('autogrow') && input.parentNode.getAttribute('autogrow') === 'true' ) )
-						{
-							setTimeout( () => { input._class.autogrow(); }, 50 );
-						}
 					}
 				} );
 			}
@@ -69,10 +65,32 @@
 			data()
 			{
 				let data = {};
-				for( var pair of ( new FormData(this.form) ).entries() )
+
+				Array.from( this.form.elements ).forEach( input =>
 				{
-					data[ pair[0] ] = pair[1];
-				}
+					if( input )
+					{
+						if( input.nodeName === 'INPUT' && ['checkbox', 'radio'].indexOf( input.type ) > -1 )
+						{
+ 							if( input.checked ){ data[ input.name ] = 1; }else if( input.type === 'checkbox' ){ data[ input.name ] = 0; }
+						}
+						else if( input.nodeName === 'SELECT' && input.type === 'select-multiple')
+						{
+							Array.from( input.options ).forEach( option =>
+							{
+								if ( option.selected )
+								{
+									if( !data[ input.name ] ){ data[ input.name ] = []; }
+									data[ input.name ].push( option.value );
+								}
+							} );
+						}
+						else
+						{
+							data[ input.name ] = input.value;
+						}
+					}
+				} );
 
 				return data;
 			}
@@ -90,10 +108,7 @@
 				let checkInputs =  this.checkValidity();
 				if( checkInputs.length > 0 ){ this.addError( checkInputs ); return; }
 
-				let data = {};
-				for( var pair of ( new FormData(form) ).entries() ) { data[ pair[0] ] = pair[1]; }
-
-				return fetch( form.getAttribute('action'), { method : method, body : JSON.stringify( data ), headers : new Headers({'Content-Type': methods[method], 'Cache-Control' : 'no-cache' }) } )
+				return fetch( form.getAttribute('action'), { method : method, body : JSON.stringify( this.data() ), headers : new Headers({'Content-Type': methods[method], 'Cache-Control' : 'no-cache' }) } )
 					.then( ( response ) =>
 					{
 						if( ['application/json'].includes( response.headers.get('Content-Type') ) )

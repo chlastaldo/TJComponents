@@ -91,7 +91,7 @@
 {
 	--progress: 0;
 	cursor: default;
-	
+
 	&.reset
 	{
 		&:before

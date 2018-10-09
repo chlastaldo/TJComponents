@@ -1,4 +1,4 @@
-<style require="/style/form.style">
+<style require="form.style">
 .input-checkbox
 {
     display: block;
@@ -45,7 +45,7 @@
 
 	input[type="checkbox"]:checked + label.input-element-checkbox-label::after
 	{
-	    content: "\002714";
+	    content: "\002713";
 		font-size: 15px;
 		font-weight: 200;
 		font-family: Arial,Helvetica Neue,Helvetica,sans-serif;
