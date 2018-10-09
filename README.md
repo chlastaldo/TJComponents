@@ -1,5 +1,3 @@
 # TJComponents
 
-###### In Development
-
-Components for liqd-template^1.7.0
+###### Components for liqd-template^1.7.0
