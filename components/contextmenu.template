@@ -126,6 +126,7 @@
 	}
 </script>
 
-<script instance parentNode={parentNode} content={ await CONTENT } selectors={selectors}>
+<script instance parentNode={parentNode} content={ await CONTENT } selectors={selectors} preventDefault={( typeof preventDefault !== 'undefined' ? preventDefault : 'true' )}>
+	if( preventDefault === 'true' ) { document.addEventListener('contextmenu', event => event.preventDefault()); }
 	new Contextmenu( parentNode, { content, selectors } )
 </script>
