@@ -484,15 +484,15 @@ var UI_Dialogs = new( function()
 			alert.querySelector('.close').onclick = function(){ hideAlert( alert ); }
 		  alerts.appendChild(alert);
 		  setTimeout(function(){  hideAlert( alert ); }, Math.min(60000, options.timeout ? options.timeout : 3000 ));
-		  setTimeout(function(){ alert.removeClass('created'); }, 50);
+		  setTimeout(function(){ alert.classList.remove('created'); }, 50);
 
 	}
 
 	function hideAlert( alert )
 	{
-		if( alert && document.body.contains( alert ) && !alert.hasClass('destoyed') )
+		if( alert && document.body.contains( alert ) && !alert.classList.contains('destoyed') )
 		{
-			alert.removeClass('created').addClass('destroyed');
+			alert.classList.replace('created','destroyed');
 			setTimeout(function()
 			{
 				if( document.body.contains( alert ) ){ alert.parentNode.removeChild(alert); }
@@ -503,9 +503,9 @@ var UI_Dialogs = new( function()
     function hideDialog( )
     {
         var dialog = document.getElementById('dialog');
-        if( dialog && document.body.contains( dialog ) && !dialog.hasClass('destoyed') )
+        if( dialog && document.body.contains( dialog ) && !dialog.classList.contains('destoyed') )
         {
-            dialog.removeClass('created').addClass('destroyed');
+            dialog.classList.replace('created','destroyed');
             setTimeout(function(){ if( document.body.contains( dialog ) ){ document.body.removeChild(dialog); } }, 350);
         }
     }
@@ -544,7 +544,7 @@ var UI_Dialogs = new( function()
             document.body.appendChild(dialog);
 			DOM_execute( dialog );
 
-            setTimeout(function(){ dialog.removeClass('created'); }, 50);
+            setTimeout(function(){ dialog.classList.remove('created'); }, 50);
         }
     }
 
@@ -591,33 +591,39 @@ var UI_Dialogs = new( function()
             overlay.id = 'popup-overlay';
         if( typeof options.clazz != 'undefined' && options.clazz ){ overlay.className = options.clazz; }
 
-        if( typeof options.header != 'undefined' )
+        if( typeof options.header != 'undefined' && options.header != '' )
         {
             html_content += '<div class="popup-header">'+options.header+'</div>';
         }
 
         html_content += content;
-        overlay.innerHTML = '<div id="popup" class="created'+( ( typeof options.header != 'undefined' )?( ' popup-headers' ):( '' ) )+'" style="'+( options.hasOwnProperty('style') ? options.style : '' )+'">'+html_content+'</div>';
+        overlay.innerHTML = '<div id="popup" class="created'+( ( typeof options.header != 'undefined' && options.header != '' )?( ' popup-headers' ):( '' ) )+'" style="'+( options.hasOwnProperty('style') ? options.style : '' )+'">'+html_content+'</div>';
         document.body.appendChild(overlay);
 
 		DOM_execute( overlay );
 
-        setTimeout(function(){ document.getElementById('popup').removeClass('created'); }, 50);
+        setTimeout(function(){ document.getElementById('popup').classList.remove('created'); }, 50);
     }
 
 	this.forceClosePopup = function()
 	{
-		document.getElementById('popup').removeClass('created').addClass('destroyed');
+		document.getElementById('popup').classList.replace('created','destroyed');
 
 		if( document.getElementById('popup-overlay') ){ document.getElementById('popup-overlay').remove(); }
 	}
 
     this.closePopup = function()
     {
-        document.getElementById('popup').removeClass('created').addClass('destroyed');
+        document.getElementById('popup').classList.replace('created','destroyed');
 
         setTimeout(function(){ if( document.getElementById('popup-overlay') ){ document.getElementById('popup-overlay').remove(); } }, 350);
     }
 })();
 
 </script>
+if( typeof CONTENT !== 'undefined' )
+{
+	<script instance content={await CONTENT} header={( typeof header !== 'undefined' ? header : '' )}>
+		UI_Dialogs.popup( content, { header } );
+	</script>
+}

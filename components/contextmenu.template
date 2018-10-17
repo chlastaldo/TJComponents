@@ -1,0 +1,131 @@
+<style>
+.context-menu
+{
+	position: absolute;
+
+	background: rgba(255, 255, 255, 1);
+	box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.35);
+	padding: 6px 0;
+	border: 1px solid rgba(0, 0, 0, 0.125);
+	min-width: 150px;
+
+
+	.context-menu-item
+	{
+		position: relative;
+		font-size: 14px;
+		line-height: 15px;
+
+		height: 21px;
+		line-height: 21px;
+		padding-left: 15px;
+		padding-right: 4px;
+		cursor: pointer;
+
+		&:hover
+		{
+			background-color: #03A9F4;
+			color: #fff;
+		}
+
+	}
+}
+
+</style>
+<script>
+	if( typeof Contextmenu === 'undefined' )
+	{
+		window.Contextmenu = class Contextmenu
+		{
+			constructor( selector, options )
+			{
+				this.parentNode = document.querySelector( selector );
+				this.element = null;
+				document.querySelector( selector )._contextmenu = this;
+
+				this._options = options;
+
+				if( this._options.selectors )
+				{
+					this.addListener( this._options.selectors )
+				}
+			}
+
+			addListener( selectors )
+			{
+				document.querySelectorAll( selectors ).forEach( selector =>
+				{
+					selector.addEventListener( 'contextmenu', this.render.bind(this) );
+				} )
+			}
+
+			render( event )
+			{
+				DOM_stopPropagation(event);
+				this.element = event.target;
+
+				//this.on_action = this._action.bind( this, callback );
+				this.on_close = this._close.bind(this);
+				this.on_contextmenu = ( event )=>{ DOM_stopPropagation( event ) };
+				this.contextmenu = this._renderElement( 'div', '', { 'class' : 'context-menu' }, {} );
+
+				this.contextmenu.innerHTML = this._options.content;
+
+				Array.from( this.contextmenu.children ).forEach( item =>
+				{
+					if( item.onclick )
+					{
+						var _onclick = this._action.bind( this, item.onclick.bind( this.element ) );
+						item.onclick = null; item.setAttribute('onclick', '');
+						item.addEventListener( 'click', _onclick )
+					}
+				} );
+
+				this.contextmenu.style.position = 'absolute';
+				this.contextmenu.style.top = event.clientY+'px';
+				this.contextmenu.style.left = event.clientX+'px';
+
+				this.element.addClass('contextmenu');
+
+				document.body.appendChild( this.contextmenu );
+				document.body.addEventListener( 'mouseup', this.on_close );
+				return false;
+			}
+
+			_action( callback, event )
+			{
+				callback( event );
+				this.element.removeClass('contextmenu');
+
+				this.contextmenu.remove();
+				delete this.contextmenu;
+				document.body.removeEventListener( 'mouseup', this.on_close );
+			}
+
+			_close( event )
+			{
+				if( ( event.target.hasClass('context-menu') && this.contextmenu === event.target ) || ( event.target.parentSelector('.context-menu') === this.contextmenu ) ){ return false; }
+				this.element.removeClass('contextmenu');
+
+				this.contextmenu.remove();
+				delete this.contextmenu;
+				document.body.removeEventListener( 'mouseup', this.on_close );
+			}
+
+			_renderElement( element, html = '', attributes = {}, listeners = {} )
+			{
+				let item = document.createElement( element );
+				item.innerHTML = html;
+
+				for( let attr in attributes ){ item.setAttribute( attr, attributes[ attr ] ); }
+				for( let listener in listeners ){ item.addEventListener( listener, listeners[listener] ); }
+
+				return item;
+			}
+		}
+	}
+</script>
+
+<script instance parentNode={parentNode} content={ await CONTENT } selectors={selectors}>
+	new Contextmenu( parentNode, { content, selectors } )
+</script>
