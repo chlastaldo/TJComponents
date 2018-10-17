@@ -233,79 +233,21 @@
 		}
 	}
 
-	class Contextmenu
+	function treeContextMenu( element, event )
 	{
-		constructor( element, event )
+		const action = event.target.getAttribute('action');
+		if( ['newTest', 'newGroup'].includes( action ) )
 		{
-			this.element = ( typeof element === 'string' ? document.querySelector( element ) : element );
-			this.menuItems =  { newTest : 'New Test', newGroup : 'New Group' };
-
-			this.render( event );
-		}
-
-		render( event )
-		{
-			DOM_stopPropagation(event);
-
-			this.on_action = this.actionContectmenu.bind( this );
-			this.on_close = this.closeContextmenu.bind(this);
-			this.on_contextmenu = ( event )=>{ DOM_stopPropagation( event ) };
-			this.contextmenu = this._renderElement( 'div', '', { 'class' : 'context-menu' }, {} );
-
-			for( let key in this.menuItems )
-			{
-				this.contextmenu.appendChild( this._renderElement( 'div', this.menuItems[key], { 'class' : 'context-menu-item', 'action' : key }, { click : this.on_action, contextmenu : this.on_contextmenu } ) );
-			}
-
-			this.contextmenu.style.position = 'absolute';
-			this.contextmenu.style.top = event.clientY+'px';
-			this.contextmenu.style.left = event.clientX+'px';
-
-			this.element.addClass('contextmenu');
-
-			document.body.appendChild( this.contextmenu );
-			document.body.addEventListener( 'mouseup', this.on_close );
-			return false;
-		}
-
-		actionContectmenu( event )
-		{
-			DOM_stopPropagation(event);
-			const action = event.target.getAttribute('action');
-			if( ['newTest', 'newGroup'].includes( action ) )
-			{
-				let node = document.querySelector('.TreeNode.open');
-				if( node ){ node.classList.remove('open') }
-				getDetail( null, { type : ( action === 'newTest' ? 'test' : 'group' ), parentId : this.element.parentNode.parentNode.getAttribute('data-id') } );
-			}
-
-			this.element.removeClass('contextmenu');
-			this.contextmenu.remove();
-			delete this.contextmenu;
-			document.body.removeEventListener( 'mouseup', this.on_close );
-		}
-
-		closeContextmenu( event )
-		{
-			if( ( event.target.hasClass('context-menu') && this.contextmenu === event.target ) || ( event.target.parentSelector('.context-menu') === this.contextmenu && event.target.hasClass('context-menu-item') ) ){ return false; }
-			this.element.removeClass('contextmenu');
-			this.contextmenu.remove();
-			delete this.contextmenu;
-			document.body.removeEventListener( 'mouseup', this.on_close );
-		}
-
-		_renderElement( element, html = '', attributes = {}, listeners = {} )
-		{
-			let item = document.createElement( element );
-			item.innerHTML = html;
-
-			for( let attr in attributes ){ item.setAttribute( attr, attributes[ attr ] ); }
-			for( let listener in listeners ){ item.addEventListener( listener, listeners[listener] ); }
-
-			return item;
+			let node = document.querySelector('.TreeNode.open');
+			if( node ){ node.classList.remove('open') }
+			getDetail( null, { type : ( action === 'newTest' ? 'test' : 'group' ), parentId : element.parentNode.parentNode.getAttribute('data-id') } );
 		}
 	}
 </script>
 <div class="Tree">
 	<Treenodes tree={tree}/>
 </div>
+<Contextmenu parentNode="#Tree">
+	<div class="context-menu-item" action="newTest" onclick="treeContextMenu( this, event )">New test</div>
+	<div class="context-menu-item" action="newGroup" onclick="treeContextMenu( this, event )">New group</div>
+</Contextmenu>

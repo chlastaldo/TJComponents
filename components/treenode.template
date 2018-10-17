@@ -5,7 +5,7 @@
 		{
 			<Checkbox id={node.id} style="display:inline-block;vertical-align: top;" />
 		}
-		<span onclick="openTreeNode(this.parentNode.parentNode )" oncontextmenu={( node.type === 'group' ? 'new Contextmenu( this, event )' : null )}>
+		<span onclick="openTreeNode(this.parentNode.parentNode )" oncontextmenu={( node.type === 'group' ? 'document.querySelector(\'#Tree\')._contextmenu.render( event )' : null )}>
 			{node.label}
 		</span>
 	</div>

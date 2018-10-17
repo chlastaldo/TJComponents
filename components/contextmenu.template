@@ -21,6 +21,7 @@
 		padding-left: 15px;
 		padding-right: 4px;
 		cursor: pointer;
+		-moz-user-select: none; -webkit-user-select: none; -ms-user-select: none; user-select: none; cursor: defualt;
 
 		&:hover
 		{
@@ -45,7 +46,7 @@
 
 				this._options = options;
 
-				if( this._options.selectors )
+				if( this._options.selectors !== '' )
 				{
 					this.addListener( this._options.selectors )
 				}
@@ -64,18 +65,15 @@
 				DOM_stopPropagation(event);
 				this.element = event.target;
 
-				//this.on_action = this._action.bind( this, callback );
 				this.on_close = this._close.bind(this);
-				this.on_contextmenu = ( event )=>{ DOM_stopPropagation( event ) };
-				this.contextmenu = this._renderElement( 'div', '', { 'class' : 'context-menu' }, {} );
-
+				this.contextmenu = this._renderElement( 'div', '', { 'class' : 'context-menu' }, { contextmenu : event => event.preventDefault() } );
 				this.contextmenu.innerHTML = this._options.content;
 
 				Array.from( this.contextmenu.children ).forEach( item =>
 				{
 					if( item.onclick )
 					{
-						var _onclick = this._action.bind( this, item.onclick.bind( this.element ) );
+						var _onclick = this._action.bind( this, item.onclick );
 						item.onclick = null; item.setAttribute('onclick', '');
 						item.addEventListener( 'click', _onclick )
 					}
@@ -94,7 +92,7 @@
 
 			_action( callback, event )
 			{
-				callback( event );
+				callback.bind( this.element )( event );
 				this.element.removeClass('contextmenu');
 
 				this.contextmenu.remove();
@@ -126,7 +124,7 @@
 	}
 </script>
 
-<script instance parentNode={parentNode} content={ await CONTENT } selectors={selectors} preventDefault={( typeof preventDefault !== 'undefined' ? preventDefault : 'true' )}>
+<script instance parentNode={parentNode} content={ await CONTENT } selectors={( typeof selectors !== 'undefined' ? selectors : '' )} preventDefault={( typeof preventDefault !== 'undefined' ? preventDefault : 'true' )}>
 	if( preventDefault === 'true' ) { document.addEventListener('contextmenu', event => event.preventDefault()); }
 	new Contextmenu( parentNode, { content, selectors } )
 </script>
