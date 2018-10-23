@@ -6,7 +6,6 @@
 	@border-box;
     display: inline-block;
 	vertical-align: top;
-	width: 100%;
     height: 42px;
     line-height: 40px;
     position: relative;
@@ -157,7 +156,7 @@ if( typeof Textarea === 'undefined' )
 	}
 }
 </script>
-<div class={'input-textarea'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')+(typeof disabled !== 'undefined' && disabled === 'true' ? ' disabled' : '')+(typeof label === 'undefined' ? ' not-label' : '')} style={ ( typeof style !== 'undefined' ? style : '' )+( typeof height !== 'undefined' ? 'height:'+height+';' : '' ) } autogrow={(typeof autogrow !== 'undefined' && autogrow === 'true' ? autogrow : null )}>
+<div class={'input-textarea'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')+(typeof disabled !== 'undefined' && disabled === 'true' ? ' disabled' : '')+(typeof label === 'undefined' ? ' not-label' : '')} style={ ( typeof style !== 'undefined' ? style : '' )+'width:'+(typeof width !== 'undefined' ? width : '100%')+';'+( typeof height !== 'undefined' ? 'height:'+height+';' : '' ) } autogrow={(typeof autogrow !== 'undefined' && autogrow === 'true' ? autogrow : null )}>
 	<textarea id={id} name={id} onkeyup={(typeof onkeyup !== 'undefined' ? onkeyup : null)} onchange={(typeof onchange !== 'undefined' ? onchange : null)} disabled={(typeof disabled !== 'undefined' ? disabled : null)} required={(typeof required !== 'undefined' ? required : null)} placeholder={(typeof placeholder !== 'undefined' ? placeholder : '')} class={ typeof clazz !== 'undefined' ? 'textarea '+clazz : 'textarea' } autocomplete="off">{(typeof value !== 'undefined' ? value : '')}</textarea>
 	if( typeof label !== 'undefined' )
 	{

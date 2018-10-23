@@ -6,7 +6,6 @@
 	@border-box;
 	display: inline-block;
 	vertical-align: top;
-	width: 100%;
     height: 42px;
     line-height: 40px;
     position: relative;
@@ -114,7 +113,7 @@
 
 	//this.
 </script>
-<div class={'input-text'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')}>
+<div style={'width:'+(typeof width !== 'undefined' ? width : '100%')+';'} class={'input-text'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')}>
 	<div class={ typeof clazz !== 'undefined' ? 'input '+clazz : 'input' }>{(typeof value !== 'undefined' ? value : '')}</div>
 	<label class="label">{label}</label>
 	<input type="file" id={id} name={id} webkitdirectory="" directory="" required={(typeof required !== 'undefined' ? required : null)}/>

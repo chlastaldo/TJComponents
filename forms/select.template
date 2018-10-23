@@ -6,7 +6,6 @@
 	@border-box;
 	display: inline-block;
 	vertical-align: top;
-	width: 100%;
     height: 42px;
     line-height: 40px;
     position: relative;
@@ -16,28 +15,33 @@
 
 	.input
 	{
-		display: inline-block;
+		display: block;
 		height: 20px;
 		line-height: 20px;
 		margin-top: 10px;
 		margin-bottom: 10px;
-		padding: 0 5px;
+		padding: 0 20px 0 5px;
 		position: relative;
 		width: 100%;
 		transition: margin-top 50ms ease-in 0s;
 		border: 0;
 		outline: none;
 		@border-box;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 
 		&:after
 		{
-			content: "";
+			content: "\f0d7";
+			font-family: "Font Awesome 5 Free";
+			font-weight: 900;
+			font-size: 20px;
 			top: 0;
 			right: 0;
 			bottom: 0;
 			width: 20px;
 			height: 20px;
-			background: no-repeat url('/static/images/solid.svg#caret-down');
 			position: absolute;
 			text-align: center;
 			background-color: white;
@@ -64,7 +68,7 @@
 	{
 		position: absolute;
 		left: 0;
-		top: 43px;
+		top: 40px;
 		background-color: transparent;
 		width: 100%;
 		border: 1px solid transparent;
@@ -148,6 +152,15 @@
 				opacity: 0.7;
 			}
 		}
+
+		&.not-label
+		{
+			.input
+			{
+				margin-bottom: 10px;
+			    margin-top: 10px;
+			}
+		}
 	}
 	&.focus
 	{
@@ -158,7 +171,6 @@
 			background-color: #fff;
 			z-index: 1;
 			margin-left: -1px;
-			margin-top: -1px;
 		}
 	}
 }
@@ -326,11 +338,11 @@
 		}
 	}
 </script>
-<div class={'input-select'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')}>
+<div style={'width:'+(typeof width !== 'undefined' ? width : '100%')+';'} class={'input-select'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')+(typeof disabled !== 'undefined' && disabled === 'true' ? ' disabled' : '')+(typeof label === 'undefined' ? ' not-label' : '')}>
 	<input type="hidden" value={(typeof value !== 'undefined' ? value : '')} name={(typeof id !== 'undefined' ? id : '')} id={(typeof id !== 'undefined' ? id : '')} data-join={(typeof join !== 'undefined' ? join : null )} />
 	<div class="input"></div>
 	<div class="select-wrap">
-		if( suggest )
+		if( typeof suggest !== 'undefined' )
 		{
 			<input placeholder="Search" autocomplete="off" class="input-element-text" onkeypress="return event.keyCode!=13" type="text" data-request={ ( typeof request !== 'undefined' ? encodeURIComponent( request ) : null ) }/>
 		}
@@ -341,7 +353,10 @@
 			<div class={'select-option'+( typeof value !== 'undefined' && value === key ? ' active' : '' )} data-value={key}>{item}</div>
 		}
 	</div>
-	<label for={id} class="label">{label}</label>
+	if( typeof label !== 'undefined' )
+	{
+		<label for={id} class="label">{label}</label>
+	}
 </div>
 
 <script instance id={id} value={value} option={option} init={( typeof init !== 'undefined' ? init : 'true' )}>

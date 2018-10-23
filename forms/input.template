@@ -6,7 +6,6 @@
 	@border-box;
 	display: inline-block;
 	vertical-align: top;
-	width: 100%;
     height: 42px;
     line-height: 40px;
     position: relative;
@@ -142,7 +141,7 @@
 		}
 	}
 </script>
-<div class={'input-text'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')+(typeof disabled !== 'undefined' && disabled === 'true' ? ' disabled' : '')+(typeof label === 'undefined' ? ' not-label' : '')} style={(typeof style !== 'undefined' ? style : null )}>
+<div  style={'width:'+(typeof width !== 'undefined' ? width : '100%')+';'} class={'input-text'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')+(typeof disabled !== 'undefined' && disabled === 'true' ? ' disabled' : '')+(typeof label === 'undefined' ? ' not-label' : '')} style={(typeof style !== 'undefined' ? style : null )}>
 	<input onkeypress="return ( event.keyCode == 13 ? false : true );" id={id} name={id} required={(typeof required !== 'undefined' ? required : null)} pattern={(typeof pattern !== 'undefined' ? pattern : null)} placeholder={(typeof placeholder !== 'undefined' ? placeholder : '')} value={(typeof value !== 'undefined' ? value : '')} class={ typeof clazz !== 'undefined' ? 'input '+clazz : 'input' } disabled={(typeof disabled !== 'undefined' && disabled === 'true' ? 'disabled' : null )} onchange={ typeof onchange !== 'undefined' ? onchange : null } onkeyup={ typeof onkeyup !== 'undefined' ? onkeyup : null } onkeydown={ typeof onkeydown !== 'undefined' ? onkeydown : null } autocomplete="off" type={type}/>
 	if( typeof label !== 'undefined' )
 	{

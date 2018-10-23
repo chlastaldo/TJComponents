@@ -20,6 +20,11 @@
 				} );
 			}
 
+			clearValue()
+			{
+				Array.from( this.form.elements ).forEach( ( input ) => { this.setValue( input, '' ) } )
+			}
+
 			setValue( input, value )
 			{
 				this.form.elements[input].value = value;
@@ -97,18 +102,18 @@
 
 			post( form, callback = null )
 			{
-				this.form = form;
+				if( form ){ this.form = form; }
 				this.removeError();
 
 				let methods = { 'PUT' 	: 'application/json', 'POST'	: 'application/json', 'PATCH' : 'application/json', 'DELETE': 'application/json' };
-				let method = form.getAttribute('method');
+				let method = this.form.getAttribute('method');
 
 				if( Object.keys( methods ).indexOf( method ) === -1 ){ console.log( 'Unsupported method '+ method ); return null; }
 
 				let checkInputs =  this.checkValidity();
 				if( checkInputs.length > 0 ){ this.addError( checkInputs ); return; }
 
-				return fetch( form.getAttribute('action'), { method : method, body : JSON.stringify( this.data() ), headers : new Headers({'Content-Type': methods[method], 'Cache-Control' : 'no-cache' }) } )
+				return fetch( this.form.getAttribute('action'), { method : method, body : JSON.stringify( this.data() ), headers : new Headers({'Content-Type': methods[method], 'Cache-Control' : 'no-cache' }) } )
 					.then( ( response ) =>
 					{
 						if( ['application/json'].includes( response.headers.get('Content-Type') ) )

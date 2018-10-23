@@ -1,4 +1,4 @@
-<Select id={id} label={label} option={option} value={value} join={( typeof join !== 'undefined' ? join : null )} suggest={( typeof suggest !== 'undefined' ? suggest : null )} request={( typeof request !== 'undefined' ? request : null )} init="false"/>
+<Select id={id} label={( typeof label !== 'undefined' ? label : undefined )} option={option} value={value} join={( typeof join !== 'undefined' ? join : null )} width={( typeof width !== 'undefined' ? width : undefined )} suggest={( typeof suggest !== 'undefined' ? suggest : undefined )} request={( typeof request !== 'undefined' ? request : null )} init="false"/>
 <script>
 	if( typeof Multiselect === 'undefined' )
 	{
@@ -43,7 +43,7 @@
 			{
 				this._element.querySelector('.input').innerHTML = this._values.map( ( value ) => { return value.label } ).filter( item => { return item != '' } ).join( ', ' );
 				this._input.value = this._values.map( ( value ) => { return value.value } ).join( this._join );
-				
+
 				if( this._input.value !== '' )
 				{
 					this._element.classList.add('fill');
