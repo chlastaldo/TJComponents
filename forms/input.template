@@ -109,6 +109,7 @@
 		{
 			constructor( input )
 			{
+				input._class = this;
 				this._input = input;
 				this._element = this._input.parentNode;
 				this._element.addEventListener( 'click', this.input_focus.bind(this) );
@@ -137,6 +138,12 @@
 				{
 					this._element.classList.remove('fill');
 				}
+			}
+
+			setValue( value )
+			{
+				this._input.value = value;
+				this._element.classList[ ( value === '' ? 'remove' : 'add' ) ]( 'fill' );
 			}
 		}
 	}

@@ -187,7 +187,7 @@ $dialog_radius_w: 6px;
 $dialog_background_w: #fff;
 $dialog_border_w: 1px solid #ccc;
 
-:root
+.popup_dark
 {
 	--overlay_background: $overlay_background;
 	--dialog_shadow : $dialog_shadow;
@@ -196,7 +196,7 @@ $dialog_border_w: 1px solid #ccc;
 	--dialog_background : $dialog_background;
 	--dialog_border : $dialog_border;
 }
-body.white
+.popup_light
 {
 	--overlay_background: $overlay_background_w;
 	--dialog_shadow : $dialog_shadow_w;
@@ -589,7 +589,9 @@ var UI_Dialogs = new( function()
         var html_content = '';
         var overlay = document.createElement('div');
             overlay.id = 'popup-overlay';
-        if( typeof options.clazz != 'undefined' && options.clazz ){ overlay.className = options.clazz; }
+			overlay.className = ( typeof options.theme != 'undefined' && options.theme != '' ? 'popup_'+options.theme : 'popup_dark' );
+        if( typeof options.clazz != 'undefined' && options.clazz ){ overlay.className += ' '+options.clazz; }
+
 
         if( typeof options.header != 'undefined' && options.header != '' )
         {
@@ -607,14 +609,16 @@ var UI_Dialogs = new( function()
 
 	this.forceClosePopup = function()
 	{
-		document.getElementById('popup').classList.replace('created','destroyed');
+		document.getElementById('popup').classList.remove('created');
+		document.getElementById('popup').classList.add('destroyed');
 
 		if( document.getElementById('popup-overlay') ){ document.getElementById('popup-overlay').remove(); }
 	}
 
     this.closePopup = function()
     {
-        document.getElementById('popup').classList.replace('created','destroyed');
+        document.getElementById('popup').classList.remove('created');
+		document.getElementById('popup').classList.add('destroyed');
 
         setTimeout(function(){ if( document.getElementById('popup-overlay') ){ document.getElementById('popup-overlay').remove(); } }, 350);
     }
@@ -623,7 +627,7 @@ var UI_Dialogs = new( function()
 </script>
 if( typeof CONTENT !== 'undefined' )
 {
-	<script instance content={await CONTENT} header={( typeof header !== 'undefined' ? header : '' )}>
-		UI_Dialogs.popup( content, { header } );
+	<script instance theme={ ( typeof theme !== 'undefined' ? theme : 'dark' ) } content2={( await CONTENT ).replace(/</g,'&lt;').replace(/>/g,'&gt;')} header={( typeof header !== 'undefined' ? header : '' )}>
+		UI_Dialogs.popup( content2.replace(/&lt;/g,'<').replace(/&gt;/g,'>'), { header, theme } );
 	</script>
 }

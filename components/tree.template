@@ -186,14 +186,14 @@
 <script>
 	function openTreeNode( node, type )
 	{
-		let old_open = document.querySelector('.TreeNode.open');
-		if( old_open && old_open != node ){ old_open.classList.remove('open') }
-
 		getDetail( node, { id : node.getAttribute('data-id'), type : node.getAttribute('data-type') } );
 	}
 
 	function getDetail( node, post )
 	{
+		let old_open = document.querySelector('.TreeNode.open');
+		if( old_open && old_open != node ){ old_open.classList.remove('open') }
+		
 		DOM_request( 'POST', '/detail', post, ( message ) =>
 		{
 			if( node ){ node.classList.add('open'); }
@@ -201,9 +201,11 @@
 		} );
 	}
 
-	function refreshTreeNode( id )
+	var oldTreeOpen = null;
+	function refreshTreeNode( data )
 	{
-		var node = document.querySelector('.TreeNode[data-id="'+id+'"]');
+		oldTreeOpen = data;
+		var node = document.querySelector('.TreeNode[data-id="'+data.parentID+'"]');
 			node.classList.add('collapsed');
 			node.querySelector('.children').innerHTML = '';
 			node.querySelector('.expand').click();
@@ -221,6 +223,12 @@
 				{
 					node.childNodes[2].classList.remove( 'loading' );
 					node.childNodes[2].innerHTML = message;
+
+					if( oldTreeOpen )
+					{
+						document.querySelector('.TreeNode[data-id="'+oldTreeOpen.id+'"].TreeNode[data-type="'+oldTreeOpen.type+'"]').classList.add( 'open' );
+						oldTreeOpen = null;
+					}
 				} );
 			}
 
@@ -240,7 +248,7 @@
 		{
 			let node = document.querySelector('.TreeNode.open');
 			if( node ){ node.classList.remove('open') }
-			getDetail( null, { type : ( action === 'newTest' ? 'test' : 'group' ), parentId : element.parentNode.parentNode.getAttribute('data-id') } );
+			getDetail( null, { type : ( action === 'newTest' ? 'test' : 'group' ), parentID : element.parentNode.parentNode.getAttribute('data-id') } );
 		}
 	}
 </script>

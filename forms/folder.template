@@ -81,6 +81,7 @@
 		{
 			constructor( input )
 			{
+				input._class = this;
 				this._input = input;
 				this._element = this._input.parentNode;
 				this._element.addEventListener( 'click', this.input_focus.bind(this) );

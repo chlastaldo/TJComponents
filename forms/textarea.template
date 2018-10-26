@@ -124,6 +124,12 @@ if( typeof Textarea === 'undefined' )
 			}
 		}
 
+		setValue( value )
+		{
+			this._input.value = value;
+			this._element.classList[ ( value === '' ? 'remove' : 'add' ) ]( 'fill' );
+		}
+
 		input_focus()
 		{
 			this._input.focus();

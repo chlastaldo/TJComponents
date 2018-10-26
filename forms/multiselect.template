@@ -53,6 +53,17 @@
 					this._element.classList.remove('fill');
 				}
 			}
+
+			setValue( value )
+			{
+				this._values = [];
+				if( value != '' )
+				{
+					value.split( ',' ).forEach( item => { this._values.push( { item, label : this._option[ item ] } ) } );
+				}
+
+				this._setValue();
+			}
 		}
 	}
 </script>

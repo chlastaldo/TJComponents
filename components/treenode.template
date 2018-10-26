@@ -1,4 +1,4 @@
-<div class={ 'TreeNode'+( node.type === 'test' && node.enabled === false ? ' disable' : '' )+( typeof node.children === 'boolean' && node.children === true ? ' collapsed' : '' )+( node.type === 'group' ? ' expandable' : '' ) } data-id={node.id} data-type={node.type}>
+<div class={ 'TreeNode'+( node.type === 'test' && node.enabled === 1 ? ' disable' : '' )+( typeof node.children === 'boolean' && node.children === true ? ' collapsed' : '' )+( node.type === 'group' ? ' expandable' : '' ) } data-id={node.id} data-type={node.type}>
 	<div class={ 'expand '+node.type  } onclick={ ( node.type === 'group' ? 'expandTreeNode(this.parentNode )' : null ) }></div>
 	<div class="label">
 		if( typeof checkbox !== 'undefined' && checkbox && node.type === 'group' )
@@ -6,7 +6,7 @@
 			<Checkbox id={node.id} style="display:inline-block;vertical-align: top;" />
 		}
 		<span onclick="openTreeNode(this.parentNode.parentNode )" oncontextmenu={( node.type === 'group' ? 'document.querySelector(\'#Tree\')._contextmenu.render( event )' : null )}>
-			{node.label}
+			{node.name}
 		</span>
 	</div>
 	if( node.type === 'group' )

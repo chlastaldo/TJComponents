@@ -9,7 +9,7 @@
     height: 42px;
     line-height: 40px;
     position: relative;
-    cursor: text;
+    cursor: pointer;
     background-color: $form_background_color;
     color: $form_color;
 
@@ -52,6 +52,7 @@
 
 	label
 	{
+		cursor: pointer;
 		font-size: 14px;
 		font-weight: 400;
 		height: 20px;
@@ -182,6 +183,8 @@
 		{
 			constructor( input, value, option )
 			{
+				input._class = this;
+
 				this._input = input;
 				this._element = this._input.parentNode;
 
@@ -199,7 +202,7 @@
 				{
 					input_text.addEventListener( 'keyup', this.keyup.bind( this, input_text ) );
 				}
-
+				this._option = option;
 				this._values = ( value ? [{ value, label : option[ value ] }] : [] );
 				this._setValue();
 
@@ -221,13 +224,20 @@
 
 			focus( event )
 			{
-				if( event.target.classList.contains('input-select') || event.target.classList.contains('input') )
+				if( event.target.classList.contains('input-select') || event.target.classList.contains('input') || event.target.classList.contains('label') )
 				{
 					this._element.querySelector('.select-wrap').style.maxHeight = Math.max( 150, ( document.body.getBoundingClientRect().height - this._element.querySelector('.select-wrap').getBoundingClientRect().y - 100 ) )+'px';
 					this._element.classList.add('focus');
 
 					if( this._element.querySelector('.select-wrap input[type="text"]') ){ this._element.querySelector('.select-wrap input[type="text"]').focus(); }
 				}
+			}
+
+			setValue( value )
+			{
+				this._values = [];
+				if( this._option[ value ] ){ this._values.push({ value, label : this._option[ value ] }) }
+				this._setValue();
 			}
 
 			select( element )

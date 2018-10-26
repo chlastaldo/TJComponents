@@ -5,6 +5,7 @@
 		{
 			constructor( form )
 			{
+				form._class = this;
 				this.form = form;
 			}
 
@@ -22,13 +23,20 @@
 
 			clearValue()
 			{
-				Array.from( this.form.elements ).forEach( ( input ) => { this.setValue( input, '' ) } )
+				Array.from( this.form.elements ).forEach( ( input ) => { this.setValue( input.name, '' ); } );
 			}
 
 			setValue( input, value )
 			{
-				this.form.elements[input].value = value;
-				this.form.elements[input].parentNode.classList[ ( value === '' ? 'remove' : 'add' ) ]( 'fill' );
+				if( this.form.elements[input]._class )
+				{
+					this.form.elements[input]._class.setValue( value );
+				}
+				else
+				{
+					this.form.elements[input].value = value;
+					this.form.elements[input].parentNode.classList[ ( value === '' ? 'remove' : 'add' ) ]( 'fill' );
+				}
 			}
 
 			addError( validity )
@@ -102,7 +110,9 @@
 
 			post( form, callback = null )
 			{
+				if( typeof form === 'function' ){ callback = form; form = null; }
 				if( form ){ this.form = form; }
+
 				this.removeError();
 
 				let methods = { 'PUT' 	: 'application/json', 'POST'	: 'application/json', 'PATCH' : 'application/json', 'DELETE': 'application/json' };
@@ -141,6 +151,9 @@
 	}
 </script>
 
-<form id={id} name={id} action={action} method={ ( typeof method === 'undefined' ? 'GET' : method ) } target={ ( typeof target !== 'undefined' ? target : null ) }>
+<form id={id} name={id} action={action} method={ ( typeof method === 'undefined' ? 'GET' : method ) } target={ ( typeof target !== 'undefined' ? target : null ) } class={ ( typeof clazz !== 'undefined' ? clazz : null ) }>
 	{CONTENT}
 </form>
+<script instance id={id}>
+	new Form( document.getElementById( id ) );
+</script>
