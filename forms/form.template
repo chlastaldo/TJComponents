@@ -39,14 +39,14 @@
 				}
 			}
 
-			addError( validity )
+			addError( inputs )
 			{
-				validity.forEach( ( valid ) => { this.form.elements[valid].parentNode.classList.add( 'error' ) } )
+				inputs.forEach( ( input ) => { if( this.form.elements[input] ){ this.form.elements[input].parentNode.classList.add( 'error' ) } } );
 			}
 
 			removeError()
 			{
-				Array.from( this.form.elements ).forEach( ( input ) => { input.parentNode.classList.remove( 'error' ) } )
+				Array.from( this.form.elements ).forEach( ( input ) => { input.parentNode.classList.remove( 'error' ) } );
 			}
 
 			/*

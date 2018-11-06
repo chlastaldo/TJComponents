@@ -9,9 +9,15 @@
     height: 42px;
     line-height: 40px;
     position: relative;
-    cursor: pointer;
+    cursor: text;
     background-color: $form_background_color;
     color: $form_color;
+
+	&.error
+	{
+		background-color: $form_error_background;
+		border-color: $form_error_border;
+	}
 
 	.input
 	{
@@ -31,6 +37,10 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 
+		&:empty:before {
+  content: "\200B";
+  display: inline;
+}
 		&:after
 		{
 			content: "\f0d7";
@@ -44,7 +54,7 @@
 			height: 20px;
 			position: absolute;
 			text-align: center;
-			background-color: white;
+			background-color: $form_background_color;
 			opacity: 0;
 			transition: opacity 200ms ease-in;
 		}
@@ -59,7 +69,7 @@
 		left: 5px;
 		line-height: 20px;
 		position: absolute;
-		top: 12px;
+		top: 10px;
 		color: $form_label_color;
 		transition: top 50ms ease-in 0s,font-size 50ms ease-in 0s,color 50ms ease-in 0s;
 		-webkit-transition: top 50ms ease-in 0s,font-size 50ms ease-in 0s,color 50ms ease-in 0s;
@@ -103,6 +113,11 @@
 			    border: 0;
 			    box-shadow: none;
 			}
+
+			&::-webkit-input-placeholder { color: $form_option_color; }
+			&::-moz-placeholder { color: $form_option_color; }
+			&:-ms-input-placeholder { color: $form_option_color; }
+			&:-moz-placeholder { color: $form_option_color; }
 		}
 		.select-option
 		{
@@ -115,7 +130,7 @@
 			&:hover,
 			&.active
 			{
-				background-color: #1E88E5;
+				background-color: $form_option_fill_background;
 				color: $form_option_fill_color;
 			}
 		}
@@ -131,6 +146,9 @@
 			}
 		}
 	}
+
+	&.focus{ @form_focus; }
+	&.fill{ @form_fill; }
 
 	&.focus,
 	&.fill
@@ -168,10 +186,10 @@
 		.select-wrap
 		{
 			height: auto;
-			border: 1px solid #999999;
 			background-color: #fff;
 			z-index: 1;
 			margin-left: -1px;
+			@form_focus;
 		}
 	}
 }
@@ -181,7 +199,7 @@
 	{
 		window.Select = class Select
 		{
-			constructor( input, value, option )
+			constructor( input, value, option, options = {} )
 			{
 				input._class = this;
 
@@ -192,10 +210,12 @@
 				this._element.addEventListener( 'mouseover', this.stop.bind(this) );
 				this._element.addEventListener( 'mouseout', this.hidden.bind(this) );
 
-				this._element.querySelectorAll('.select-option').forEach( ( item ) =>
+				if( options.hasOwnProperty('contenteditable') && options.contenteditable )
 				{
-					item.addEventListener( 'click', this.select.bind(this, item) );
-				} );
+					this._element.querySelector('.input').addEventListener( 'keypress', event => { if( event.keyCode === 13 ){  DOM_stopPropagation( event ) } } );
+					this._element.querySelector('.input').addEventListener( 'input', event => { event.target.previousSibling.value = event.target.textContent.replace(/\n|\t/g,' '); } );
+				}
+				this._element.querySelectorAll('.select-option').forEach( ( item ) => { item.addEventListener( 'click', this.select.bind(this, item) ); } );
 
 				let input_text = null;
 				if( ( input_text = this._element.querySelector('.select-wrap input[type="text"]') ) )
@@ -218,18 +238,19 @@
 			{
 				Timers.setTimeout( this._input.id, () =>
 		        {
+					if( this._input.value !== '' ){ this._element.classList.add('fill'); }else{ this._element.classList.remove('fill'); }
 		            this._element.classList.remove('focus');
 		        }, 500);
 			}
 
 			focus( event )
 			{
-				if( event.target.classList.contains('input-select') || event.target.classList.contains('input') || event.target.classList.contains('label') )
+				if( event.target.classList.contains('input-select') || event.target.classList.contains('input') )
 				{
 					this._element.querySelector('.select-wrap').style.maxHeight = Math.max( 150, ( document.body.getBoundingClientRect().height - this._element.querySelector('.select-wrap').getBoundingClientRect().y - 100 ) )+'px';
 					this._element.classList.add('focus');
 
-					if( this._element.querySelector('.select-wrap input[type="text"]') ){ this._element.querySelector('.select-wrap input[type="text"]').focus(); }
+					if( this._element.querySelector('.select-wrap input[type="text"]') && !this._element.querySelector('.input').getAttribute('contenteditable') ){ this._element.querySelector('.select-wrap input[type="text"]').focus(); }
 				}
 			}
 
@@ -344,15 +365,49 @@
 		        }
 		        return true;
 		    }
+			__setCaretPosition( position, element )
+			{
+				if( position === 0 ){ return; }
+				var range = document.createRange();
+				var sel = window.getSelection();
+				range.setStart(element.childNodes[0], position);
+				range.collapse(true);
 
+				sel.removeAllRanges();
+				sel.addRange(range);
+			}
+
+			__getCaretPosition(editableDiv)
+			{
+  				let caretPos = 0, sel, range;
+				if (window.getSelection)
+				{
+					sel = window.getSelection();
+					if (sel.rangeCount) { range = sel.getRangeAt(0); if (range.commonAncestorContainer.parentNode == editableDiv) { caretPos = range.endOffset; } }
+				}
+				else if (document.selection && document.selection.createRange)
+				{
+					range = document.selection.createRange();
+					if (range.parentElement() == editableDiv)
+					{
+						var tempEl = document.createElement("span");
+						editableDiv.insertBefore(tempEl, editableDiv.firstChild);
+						var tempRange = range.duplicate();
+							tempRange.moveToElementText(tempEl);
+							tempRange.setEndPoint("EndToEnd", range);
+						caretPos = tempRange.text.length;
+					}
+				}
+				return caretPos;
+			}
 		}
 	}
 </script>
 <div style={'width:'+(typeof width !== 'undefined' ? width : '100%')+';'} class={'input-select'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')+(typeof disabled !== 'undefined' && disabled === 'true' ? ' disabled' : '')+(typeof label === 'undefined' ? ' not-label' : '')}>
 	<input type="hidden" value={(typeof value !== 'undefined' ? value : '')} name={(typeof id !== 'undefined' ? id : '')} id={(typeof id !== 'undefined' ? id : '')} data-join={(typeof join !== 'undefined' ? join : null )} />
-	<div class="input"></div>
+	<div class="input" contenteditable={( typeof contenteditable !== 'undefined' ? contenteditable : null )} autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
 	<div class="select-wrap">
-		if( typeof suggest !== 'undefined' )
+		if( typeof suggest !== 'undefined' && suggest )
 		{
 			<input placeholder="Search" autocomplete="off" class="input-element-text" onkeypress="return event.keyCode!=13" type="text" data-request={ ( typeof request !== 'undefined' ? encodeURIComponent( request ) : null ) }/>
 		}
@@ -369,9 +424,9 @@
 	}
 </div>
 
-<script instance id={id} value={value} option={option} init={( typeof init !== 'undefined' ? init : 'true' )}>
+<script instance id={id} value={value} option={option} contenteditable={( typeof contenteditable !== 'undefined' ? contenteditable : false )} init={( typeof init !== 'undefined' ? init : 'true' )}>
 	if( init === 'true' )
 	{
-		new Select( document.getElementById( id ), value, option );
+		new Select( document.getElementById( id ), value, option, {contenteditable} );
 	}
 </script>

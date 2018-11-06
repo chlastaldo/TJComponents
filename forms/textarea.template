@@ -48,7 +48,7 @@
 		left: 5px;
 		line-height: 20px;
 		position: absolute;
-		top: 12px;
+		top: 10px;
 		color: $form_label_color;
 		transition: top 50ms ease-in 0s,font-size 50ms ease-in 0s,color 50ms ease-in 0s;
 		-webkit-transition: top 50ms ease-in 0s,font-size 50ms ease-in 0s,color 50ms ease-in 0s;
@@ -60,6 +60,9 @@
 		border-color: $form_error_border;
 	}
 
+	&.focus{ @form_focus; }
+	&.fill{ @form_fill; }
+	
 	&.focus,
 	&.fill
 	{

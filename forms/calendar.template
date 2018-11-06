@@ -1,0 +1,284 @@
+<style require="form.style">
+	#calendar_canvas
+	{
+		position: absolute;
+		top: 0;
+		left: 0;
+		background: #fff;
+		@form_border;
+		border-top: 0;
+
+		.calendar_days
+		{
+		    @no_select;
+		    color: $form_color;
+		    font-style: normal;
+		    width:217px;
+
+		    .month
+		    {
+		        width:217px;
+		        height: 29px;
+		        line-height: 29px;
+		        text-align: center;
+		        @bold_font;
+
+		        .calendar_back, .calendar_next
+		        {
+		            cursor: pointer;
+		            font-size: 11px;
+		            font-weight: bolder;
+		            opacity: 0.7;
+		            transition: 250ms opacity;
+		        }
+
+		        .calendar_back:hover,
+		        .calendar_next:hover
+		        {
+		            opacity: 1;
+		        }
+
+		        .calendar_back
+		        {
+		            float: left;
+		            padding-left: 10px;
+		        }
+
+		        .calendar_next
+		        {
+		            float: right;
+		            padding-right: 10px;
+		        }
+		    }
+
+		    .week
+		    {
+		        width:217px;
+		        height: 24px;
+		        border-top: 1px solid $form_border_color;
+
+				.label,
+				.other_month,
+		        .day
+		        {
+		            position:relative;
+		            float:left;
+		            width: 30px;
+		            height: 24px;
+		            text-align: center;
+		            line-height: 24px;
+		            font-size: 11px;
+		            cursor:pointer;
+		            border-right: 1px solid $form_border_color;
+		            @medium_font;
+
+		            &:last-child{ border-right: none; }
+				}
+				.day
+		        {
+					&:hover{ @form_calendar_hover; }
+
+		            &.today{  @form_calendar_today; }
+		            &.event{ @bold_font; }
+
+		            &.active{ @form_calendar_active; }
+					&.range{ @form_calendar_range; }
+
+		            &.highlighted:after{ content: ''; position:absolute; top:-1px; left:-1px; width:30px; height:24px; border:1px solid red; }
+		        }
+
+				.label{ @medium_font;cursor:default; }
+				.other_month{ color: silver; @light_font;cursor:default; }
+		    }
+		}
+	}
+</style>
+<script>
+	if( typeof Calendar === 'undefined' )
+	{
+		window.Calendar = class Calendar
+		{
+			constructor( input, options = {} )
+			{
+				input._class = this;
+				this._options = options;
+				this._input = input;
+				this._element = this._input.parentNode;
+
+				this._locale = options.locale;
+				this._options['firstDay'] = { start : ( this._options.firstDay === 'sunday' ? -1 : 0 ), dayNames : this.__getWeekDays( ( this._options.firstDay === 'sunday' ? 0 : 1 ) ) }
+
+				this._input.addEventListener( 'focus', this.focus.bind(this) );
+				this._input.addEventListener( 'blur', this.blur.bind(this) );
+
+				this._blur = null;
+			}
+
+			focus()
+			{
+console.log('focus');
+				if( !this._element.classList.contains('mousedown') )
+				{
+					this._value = ( this._input.value !== '' ? this._input.value : '' );
+
+					this._getCanvas();
+					this._renderDay( ( this._input.value !== '' ? this.__parseToDate( this._input.value ) : new Date() ) );
+
+					this._element.classList.add('focus');
+					this._element.classList.remove('mousedown');
+				}
+			}
+
+			blur()
+			{
+console.log('blur');
+				if( !this._element.classList.contains('mousedown') )
+				{
+					this._element.classList.remove('focus');
+					if( this._input.value !== '' ){ this._element.classList.add('fill'); }else if( this._input.value === '' ){ this._element.classList.remove('fill'); }
+
+					this._canvas.remove();
+				}
+			}
+
+			_getCanvas()
+			{
+				this._canvas = document.getElementById('calendar_canvas');
+
+				if( !this._canvas )
+				{
+					this._canvas = document.createElement('div');
+					this._canvas.id = 'calendar_canvas';
+					this._canvas.addEventListener( 'mousedown', (e)=>
+					{
+console.log('canvas mousedown');
+						if( e.target.classList.contains('day') ){ this._input.focus(); return false;}
+						this._element.classList.add('mousedown');
+					}  );
+					this._canvas.addEventListener( 'mouseup', (e)=>
+					{
+console.log('canvas mouseup');
+						if( this._element.classList.contains('mousedown') ){ this._input.focus(); }
+					} );
+					document.body.appendChild( this._canvas );
+				}
+
+				let element = this._element.getBoundingClientRect();
+				this._canvas.style.left = element.left+'px';
+				this._canvas.style.top = element.top + element.height+'px';
+			}
+
+			slideMonth( month, event )
+			{
+console.log('slideMonth click');
+				this._input.focus();
+				this._element.classList.add('mousedown');
+				this._renderDay( new Date( month ) );
+			}
+
+			select( day, date, event )
+			{
+				this._element.classList.remove('mousedown');
+console.log('select mousedown');
+				let old_day = null;
+				if( ( old_day = day.parentNode.parentNode.querySelector('.day.active') ) ) { old_day.classList.remove('active'); }
+				day.classList.add('active');
+				this._input.value = date;
+				this._input.setAttribute( 'date', date );
+				if( this._input.onchange ){ this._input.onchange(); }
+
+			}
+
+			_renderTime()
+			{
+			}
+
+			_renderDay( date )
+			{
+				let today = ( date.getFullYear() == ( new Date() ).getFullYear() && date.getMonth() == ( new Date() ).getMonth() ? ( new Date() ).getDate() : null );
+				let monthDays = (new Date(date.getFullYear(), date.getMonth()+1, 0)).getDate(),
+					lastMonthDays = (new Date(date.getFullYear(), date.getMonth(), 0)).getDate(),
+					firstDayOfWeek = ((new Date(date.getFullYear(), date.getMonth(), 1)).getDay() + 6) % 7;
+
+				let html  = '';
+					html += '<div class="month"><span class="calendar_back">&lt;</span>'+ this.__capitalize( date.toLocaleString( this._locale, { month: "long" } ).replace(/\u200e/g,"") )+' '+date.getFullYear()+'<span class="calendar_next">&gt;</span></div>';
+					html += '<div class="week">';
+					this._options.firstDay.dayNames.forEach( dayName => { html += '<div class="label">'+dayName+'</div>'; } )
+					html += '</div>';
+
+				let i = this._options.firstDay.start;
+				for( var w = 1; w < 7; ++w )
+				{
+					html += '<div class="week">';
+					this._options.firstDay.dayNames.forEach( item =>
+					{
+						var other_month = ( i < firstDayOfWeek || i - firstDayOfWeek + 1 > monthDays );
+						var day = ( other_month ? ( i < firstDayOfWeek ? lastMonthDays - ( ( firstDayOfWeek - 1 ) - i ) : i - firstDayOfWeek - monthDays + 1 ) : i - firstDayOfWeek + 1 );
+						var full_day = ( !other_month ? date.getFullYear()+'-'+this.__addZero( date.getMonth()+1 )+'-'+this.__addZero( day ) : '' );
+						html += '<div class="'+( other_month ? 'other_month' : 'day' )+( full_day !== '' && this._value.indexOf(full_day) === 0 ? ' active' : '' )+ ( !other_month && today == day ? ' today' : '' )+'" day="'+full_day+'">'+day+'</div>';
+
+						 ++i;
+					} )
+					html += '</div>';
+				}
+
+				let calendar_days = document.createElement('div');
+					calendar_days.className = 'calendar_days';
+					calendar_days.innerHTML = html;
+
+					calendar_days.querySelector('.calendar_back').addEventListener( 'click', this.slideMonth.bind( this, ( new Date( date.getTime() ) ).setMonth( date.getMonth() - 1 ) ) );
+					calendar_days.querySelector('.calendar_next').addEventListener( 'click', this.slideMonth.bind( this, ( new Date( date.getTime() ) ).setMonth( date.getMonth() + 1 ) ) );
+
+					calendar_days.querySelectorAll('.day:not(.other_month):not(.label)').forEach( day => day.addEventListener( 'mousedown', this.select.bind( this, day, day.getAttribute('day') ) ) );
+
+				if( !this._canvas.querySelector('.calendar_days') ){ this._canvas.appendChild(calendar_days);}else{ this._canvas.replaceChild( calendar_days, this._canvas.querySelector('.calendar_days') ); }
+			}
+
+			_renderMonth()
+			{
+
+			}
+
+			__addZero( i )
+			{
+				if (i < 10) { i = "0" + i; } return i;
+			}
+
+			__parseToDate( timestamp )
+			{
+				var time_split = timestamp.split(/[^0-9]/);
+		        return new Date (time_split[0], time_split[1]-1, time_split[2], ( typeof time_split[3] != 'undefined' ? time_split[3] : '' ), ( typeof time_split[4] != 'undefined' ? time_split[4] : '' ), ( typeof time_split[5] != 'undefined' ? time_split[5] : '' ), ( typeof time_split[6] != 'undefined' ? time_split[6] : '' ) );
+			}
+			__capitalize( _string_ )
+			{
+				return _string_.substr(0, 1).toUpperCase() + _string_.substring(1).toLowerCase();
+			}
+
+			__getWeekDays( start )
+			{
+				var weekDays = new Date();
+					weekDays.setDate( weekDays.getDate() - ( weekDays ).getDay() + start );
+				var weekDaysLabel = [];
+				for( var i = 0; 7 > i; ++i )
+				{
+					weekDaysLabel.push( weekDays.toLocaleString( this._locale, { weekday : "short" } ) )
+					weekDays.setDate( weekDays.getDate() + 1 );
+				}
+
+				return weekDaysLabel;
+			}
+		}
+	}
+</script>
+
+<div style={'width:'+(typeof width !== 'undefined' ? width : '100%')+';'} class={'input-text'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')+(typeof disabled !== 'undefined' && disabled === 'true' ? ' disabled' : '')+(typeof label === 'undefined' ? ' not-label' : '')} style={(typeof style !== 'undefined' ? style : null )}>
+	<input onkeypress="return ( event.keyCode == 13 ? false : true );" id={id} name={id} required={(typeof required !== 'undefined' ? required : null)} pattern={(typeof pattern !== 'undefined' ? pattern : null)} placeholder={(typeof placeholder !== 'undefined' ? placeholder : '')} value={(typeof value !== 'undefined' ? value : '')} class={ typeof clazz !== 'undefined' ? 'input '+clazz : 'input' } disabled={(typeof disabled !== 'undefined' && disabled === 'true' ? 'disabled' : null )} onchange={ typeof onchange !== 'undefined' ? onchange : null } onkeydown="return false;" autocomplete="off" type="text"/>
+	if( typeof label !== 'undefined' )
+	{
+		<label for={id} class="label">{label}</label>
+	}
+</div>
+
+<script instance id={id} locale={typeof locale !== 'undefined' ? locale : 'en-US' } firstDay={typeof firstDay !== 'undefined' ? firstDay : 'monday' }>
+	new Calendar( document.getElementById( id ), { firstDay, locale } );
+</script>

@@ -7,17 +7,28 @@
 @no_select{ -moz-user-select: none; -webkit-user-select: none; -ms-user-select: none; user-select: none; cursor: defualt; }
 @border-box{ -moz-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; }
 
-@form_border{ border: 1px solid #999999; }
-@form_border_radius{ border-radius: 0; }
+
 $form_background_color: #fff;
+$form_border_color: #bfbfbf;
+@form_border{ border: 1px solid $form_border_color; }
+@form_border_radius{ border-radius: 0; }
 $form_color: #545454;
 $form_color_fill: #545454;
 
-$form_label_color: #545454;
+$form_label_color: #bfbfbf;
 $form_label_fill_color: #545454;
 
 $form_option_color: #545454;
 $form_option_fill_color: #fff;
+$form_option_fill_background: #1E88E5;
 
 $form_error_background: none;
 $form_error_border: #F44336;
+
+@form_calendar_active{color: #fff; font-weight: 700; background: #C62828; border: 1px solid #C62828; margin: -1px 0 -1px -1px; }
+@form_calendar_hover{ @form_calendar_active; }
+@form_calendar_today{background-color: #F9DEDE;color: #C62828;font-weight: 700;}
+@form_calendar_range{}
+
+@form_focus{ border: 1px solid #545454; }
+@form_fill{}

@@ -56,7 +56,7 @@
 }
 </style>
 
-<div class="input-checkbox" style={(typeof style !== 'undefined' ? style : null )}>
+<div class="input-checkbox" style={'width:'+(typeof width !== 'undefined' ? width : '100%')+';'+(typeof style !== 'undefined' ? style : '')}>
 	<input type="checkbox" disabled={(typeof disabled !== 'undefined' && disabled === 'true' ? 'disabled' : null )} checked={( typeof checked !== 'undefined' && parseInt(checked) === 1 ? 'checked' : null )} value={( typeof value !== 'undefined' ? value : '' )} name={( typeof id !== 'undefined' ? id : '' )} id={( typeof id !== 'undefined' ? id : '' )} onchange={( typeof onchange !== 'undefined' ? onchange : '' )} autocomplete="off"/>
 	<label class="input-element-checkbox-label" onclick={( typeof onclick !== 'undefined' ? onclick : null )} for={( typeof id !== 'undefined' ? id : '' )}>{( typeof label !== 'undefined' ? label : '' )}</label>
 </div>

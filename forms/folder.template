@@ -55,6 +55,10 @@
 		@no_select;
 		$form_label_color: #82889c;
 	}
+	
+	&.focus{ @form_focus; }
+	&.fill{ @form_fill; }
+
 	&.focus,
 	&.fill
 	{
