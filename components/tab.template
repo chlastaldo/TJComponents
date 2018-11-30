@@ -1,0 +1,2 @@
+<div class={ 'Tab-header-item'+( typeof active !== 'undefined' ? ' active' :  '' ) } data-id={ ( typeof id !== 'undefined' ? id :  null ) } url={ ( typeof url !== 'undefined' ? url :  null ) }>{label}</div>
+<div class="Tab-content-item" data-id={ ( typeof id !== 'undefined' ? id :  null ) }>{CONTENT}</div>

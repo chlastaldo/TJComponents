@@ -808,7 +808,7 @@
 </script>
 <div class={ 'Scroll-wrapper'+( typeof color !== 'undefined' ? ' '+color : '' ) } style={ ( typeof outer_padding !== 'undefined' ? 'padding:'+outer_padding+';' : '' ) } onmouseover="Scroll.update(this)">
 	<div class="Scroll-area" onscroll="Scroll.scroll(this)">
-		<div class="Scroll-content" style={ ( typeof inner_padding !== 'undefined' ? 'padding:'+inner_padding+';' : '' ) }>
+		<div class="Scroll-content" style={ ( typeof inner_padding !== 'undefined' ? 'padding:'+inner_padding+';' : '' )+( typeof inner_height !== 'undefined' ? 'height:'+inner_height+';' : '' ) }>
 			{CONTENT}
 		</div>
 	</div>

@@ -1,0 +1,295 @@
+<style>
+$font_color: red;
+$border_color: #999;
+$header_height: 40px;
+
+.Tab
+{
+	position: relative;
+	display: bock;
+	width: 100%;
+	height: 100%;
+
+	.Tab-header-scroll
+	{
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: calc( $header_height + 1px );
+		overflow: hidden;
+
+		.Tab-header-right
+		{
+			position: absolute;
+			right: 0;
+			top: 0;
+			height: calc( $header_height - 1px );
+			line-height: calc( $header_height - 1px );
+			width: 22px;
+			text-align: right;
+			background: -moz-linear-gradient(left, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 30%, rgba(255,255,255,1) 100%);
+			background: -webkit-linear-gradient(left, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 30%,rgba(255,255,255,1) 100%);
+			background: linear-gradient(to right, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 30%,rgba(255,255,255,1) 100%);
+			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', endColorstr='#ffffff',GradientType=1 );
+			z-index: 1;
+			color: #808080;
+			cursor: pointer;
+			&.hidden{ display: none; }
+
+			&:after
+			{
+				content: '';
+				font-family: 'Segoe MDL2 Assets';
+				text-rendering: auto;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+				display: inline-block;
+				vertical-align: middle;
+			}
+		}
+		.Tab-header-left
+		{
+			position: absolute;
+			left: 0;
+			top: 0;
+			height: calc( $header_height - 1px );
+			line-height: calc( $header_height - 1px );
+			width: 22px;
+			background-color: blue;
+			text-align: left;
+			background: -moz-linear-gradient(left, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%);
+			background: -webkit-linear-gradient(left, rgba(255,255,255,1) 0%,rgba(255,255,255,1) 70%,rgba(255,255,255,0) 100%);
+			background: linear-gradient(to right, rgba(255,255,255,1) 0%,rgba(255,255,255,1) 70%,rgba(255,255,255,0) 100%);
+			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#00ffffff',GradientType=1 );
+			color: #808080;
+			cursor: pointer;
+			&.hidden{ display: none; }
+
+			&:after
+			{
+				content: '';
+				font-family: 'Segoe MDL2 Assets';
+				text-rendering: auto;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+				display: inline-block;
+				vertical-align: middle;
+			}
+		}
+
+		.Tab-header
+		{
+			position: relative;
+			white-space: nowrap;
+			height: $header_height;
+			display: flex;
+		    flex-flow: row nowrap;
+			justify-content: flex-start;
+			align-items: flex-end;
+			align-content: flex-start;
+			border-bottom: 1px solid $border_color;
+
+			.Tab-header-item
+			{
+				position: relative;
+				border-top: 1px solid transparent;
+				border-bottom: 1px solid transparent;
+				border-left: 1px solid transparent;
+				border-right: 1px solid transparent;
+				padding: 0 10px;
+				height: calc( $header_height - 2px );
+				line-height: calc( $header_height - 2px );
+				cursor: pointer;
+
+				&.active
+				{
+					border-color: $border_color;
+
+					&:after
+					{
+						content: '';
+						position: absolute;
+						left: 0;
+						bottom: -2px;
+						width: 100%;
+						height: 2px;
+						background-color: #fff;
+					}
+				}
+			}
+		}
+	}
+
+	.Tab-content-item
+	{
+		position: absolute;
+		top: $header_height;
+		left: 0;
+		width: 100%;
+		height: $header_height;
+		display: none;
+
+		&.active
+		{
+			display: block;
+		}
+	}
+}
+</style>
+<script>
+
+	if( typeof Tab === 'undefined' )
+	{
+		window.Tab = class Tab
+		{
+			constructor( tab, options )
+			{
+				let isMobile = false;
+				tab._class = this;
+
+				this._tab = tab;
+				this._timeoutSlide = null;
+				this._speed = 1;
+				this._options = options;
+
+				this._header = this._tab.querySelector('.Tab-header');
+				this._panel = this._tab.querySelectorAll('.Tab-content-item');
+
+
+				this._tab.querySelectorAll('.Tab-header-item').forEach( ( item, i ) =>
+				{
+					this._header.appendChild( item );
+					item.addEventListener( 'click', this.show.bind( this, item, this._panel[i] ) );
+				} );
+
+				this._tab.querySelectorAll('.Tab-header-right, .Tab-header-left').forEach( ( item ) =>
+				{
+					if( isMobile )
+					{
+						item.addEventListener( 'touchstart', this.slide.bind( this, item ) );
+						item.addEventListener( 'touchend', this.stopSlide.bind( this, item ) );
+					}
+						item.addEventListener( 'mouseover', this.slide.bind( this, item ) );
+						item.addEventListener( 'mouseout', this.stopSlide.bind( this, item ) );
+				} )
+
+				if( this._tab.querySelector('.Tab-header-item.active') )
+				{
+					this._tab.querySelector('.Tab-header-item.active').click();
+				}
+
+				this.resize();
+			}
+
+			show( list = null, panel = null )
+			{
+				if( list && panel )
+				{
+					this._tab.querySelectorAll('.Tab-header-item.active,.Tab-content-item.active').forEach( ( item ) =>
+					{
+						item.classList.remove('active');
+					} );
+					list.classList.add('active');
+					panel.classList.add('active');
+
+					if( list.getAttribute('url') )
+					{
+						panel.classList.add('loader');
+						DOM_request( 'GET', list.getAttribute('url'), ( html ) =>
+						{
+							panel.classList.remove('loader');
+							panel.innerHTML = html;
+							DOM_execute(panel);
+						} );
+					}
+				}
+			}
+
+			resize ()
+			{
+				let header_width = 0;
+				let header_scroll = this._tab.querySelector('.Tab-header-scroll');
+					header_scroll.querySelectorAll('.Tab-header-item').forEach( ( item ) =>
+					{
+						header_width += item.offsetWidth;
+					} );
+
+				if( header_width > header_scroll.offsetWidth )
+				{
+					if( header_scroll.querySelector('.Tab-header-right') ){ header_scroll.querySelector('.Tab-header-right').classList.remove('hidden'); }
+					if( header_scroll.querySelector('.Tab-header-left') ){ header_scroll.querySelector('.Tab-header-left').classList.add('hidden'); }
+					header_scroll.querySelector('.Tab-header').style.marginLeft = '0';
+				}
+				else
+				{
+					if( header_scroll.querySelector('.Tab-header-right') ){ header_scroll.querySelector('.Tab-header-right').classList.add('hidden'); }
+					if( header_scroll.querySelector('.Tab-header-left') ){ header_scroll.querySelector('.Tab-header-left').classList.add('hidden'); }
+					header_scroll.querySelector('.Tab-header').style.marginLeft = '0';
+				}
+			}
+
+			stopSlide( element, event )
+			{
+				event.preventDefault();
+
+				window.cancelAnimationFrame( this._timeoutSlide );
+				this._timeoutSlide = null;
+			}
+
+			slide( element, event )
+			{
+				event.preventDefault();
+
+				let header = element.parentNode;
+				let header_width = 0;
+					header.querySelectorAll( '.Tab-header-item' ).forEach( ( item ) => { header_width += item.offsetWidth; } );
+
+				this._slide.bind(this)( header, header_width, element.getAttribute('data-direction') );
+			}
+
+			_slide( header, header_width, direction )
+			{
+				var space = Math.max( 0, header_width - header.offsetWidth + ( header.querySelector('.Tab-header-addon') ? 40 : 0 ) );
+				var move_space =  Math.abs( parseInt( header.querySelector('.Tab-header').style.marginLeft) ) + parseInt( ( direction === 'left' ? -10 : 10 ) * this._speed );
+
+				if( move_space > space ){ move_space = space; }else if( move_space < 0 ){ move_space = 0; }
+
+				this._speed += ( this._speed > 1.05 ? 0.01 : 0.5 );
+				header.querySelector('.Tab-header').style.marginLeft = move_space * - 1+'px';
+
+				if( move_space == 0 )
+				{
+					header.querySelector('.Tab-header-left').classList.add('hidden');
+					header.querySelector('.Tab-header-right').classList.remove('hidden');
+				}
+				else if( move_space == space )
+				{
+					header.querySelector('.Tab-header-right').classList.add('hidden');
+					header.querySelector('.Tab-header-left').classList.remove('hidden');
+				}
+
+				if( move_space > 0 && move_space < space )
+				{
+					header.querySelector('.Tab-header-right').classList.remove('hidden');
+					header.querySelector('.Tab-header-left').classList.remove('hidden');
+				}
+
+				this._timeoutSlide = window.requestAnimationFrame( this._slide.bind( this, header, header_width, direction ) );
+			}
+		}
+	}
+</script>
+
+<div id={id} class="Tab">
+	<div class="Tab-header-scroll">
+		<div class="Tab-header" style="margin-left:0;"></div>
+		<div class="Tab-header-left " data-direction="left"></div>
+		<div class="Tab-header-right " data-direction="right"></div>
+	</div>
+	{CONTENT}
+</div>
+
+<script instance id={id}>
+	new Tab( document.getElementById( id ) );
+</script>
