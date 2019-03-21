@@ -47,16 +47,23 @@
     position: absolute;
     left: 0;
     right: 0;
-    top: 8px;
-    height: 15px;
-    width: 15px;
+    top: 3px;
+    height: 28px;
+    width: 28px;
     margin: 0 auto;
     text-align: center;
-    line-height: 15px;
-    font-size: 14px;
-    -webkit-animation: a-loader 2s infinite linear;
-    animation: a-loader 2s infinite linear;
+    line-height: 28px;
+    font-size: 25px;
+    -webkit-animation: button-spin 2s infinite linear;
+    animation: button-spin 2s infinite linear;
 }
+
+@keyframes button-spin
+{
+  0% { -webkit-transform: rotate(0deg); transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); transform: rotate(360deg); }
+}
+
 .button.loading
 {
 	cursor: default;

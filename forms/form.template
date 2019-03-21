@@ -108,11 +108,13 @@
 				return data;
 			}
 
-			post( form, callback = null )
+			post( form, callback = null, submit = null )
 			{
+				if( typeof callback === 'object' ){ submit = callback; callback = null; }
 				if( typeof form === 'function' ){ callback = form; form = null; }
 				if( form ){ this.form = form; }
 
+				if( submit && submit.classList.contains('button_loader') ){ return null }
 				this.removeError();
 
 				let methods = { 'PUT' 	: 'application/json', 'POST'	: 'application/json', 'PATCH' : 'application/json', 'DELETE': 'application/json' };
@@ -121,12 +123,13 @@
 				if( Object.keys( methods ).indexOf( method ) === -1 ){ console.log( 'Unsupported method '+ method ); return null; }
 
 				let checkInputs =  this.checkValidity();
-				if( checkInputs.length > 0 ){ this.addError( checkInputs ); return; }
+				if( checkInputs.length > 0 ){ this.addError( checkInputs ); return null; }
 
+				if( submit ){ submit.classList.add('button_loader'); }
 				return fetch( this.form.getAttribute('action'), { method : method, body : JSON.stringify( this.data() ), headers : new Headers({'Content-Type': methods[method], 'Cache-Control' : 'no-cache' }) } )
 					.then( ( response ) =>
 					{
-						if( ['application/json'].includes( response.headers.get('Content-Type') ) )
+						if( response.headers.get('Content-Type').indexOf( 'application/json' ) > -1 )
 						{
 							return response.json();
 						}
@@ -137,6 +140,7 @@
 					})
 					.then( ( response ) =>
 					{
+						if( submit ){ submit.classList.remove('button_loader') }
 						if( callback )
 						{
 							callback( response )

@@ -29,7 +29,7 @@
 		    content: "";
 		    position: absolute;
 		    left: -22px;
-		    top: 2px;
+		    top: 0;
 		    width: 14px;
 		    height: 14px;
 		    @form_border;

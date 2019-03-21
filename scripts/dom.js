@@ -935,6 +935,16 @@ function DOM_scrollInfinity( type, options )
 	}
 }
 
+function DOM_awaitRequest( method, url, data )
+{
+	return new Promise( ( resolve, reject ) =>
+	{
+		DOM_request( method, url, data, ( result ) =>
+		{
+			resolve( result );
+		} )
+	} )
+}
 
 function DOM_request( method, url, data, callback )
 {
@@ -971,7 +981,9 @@ function DOM_request( method, url, data, callback )
 	return fetch( url, requestOptions )
 		.then( ( response ) =>
 		{
-			if( ['application/json'].includes( response.headers.get('Content-Type') ) )
+			if( response.redirected ){ location.href = response.url; }
+
+			if( response.headers.get('Content-Type').indexOf( 'application/json' ) > -1 )
 			{
 				return response.json();
 			}

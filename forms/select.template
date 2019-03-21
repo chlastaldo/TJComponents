@@ -36,11 +36,21 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		cursor: pointer;
 
-		&:empty:before {
-  content: "\200B";
-  display: inline;
-}
+		&:empty:before
+		{
+			content: "\200B";
+			display: inline;
+		}
+
+		&[placeholder]:empty:before
+		{
+			content:attr(placeholder);
+			display: inline;
+			opacity: 0.6;
+		}
+
 		&:after
 		{
 			content: "\f0d7";
@@ -81,12 +91,12 @@
 		left: 0;
 		top: 40px;
 		background-color: transparent;
-		width: 100%;
+		min-width: 100%;
 		border: 1px solid transparent;
 		height: 0;
 		overflow: hidden;
-		overflow-y: hidden;
-		overflow-y: scroll;
+		overflow-x: hidden;
+		overflow-y: auto;
 		max-height: 150px;
 
 		input
@@ -119,6 +129,16 @@
 			&:-ms-input-placeholder { color: $form_option_color; }
 			&:-moz-placeholder { color: $form_option_color; }
 		}
+		.select-group
+		{
+			padding: 16px 5px 5px 5px;
+			line-height: 1;
+			font-size: 13px;
+			font-weight: 600;
+			cursor: default;
+			color: $form_option_color;
+			white-space: nowrap;
+		}
 		.select-option
 		{
 			padding: 5px;
@@ -126,6 +146,7 @@
 			font-size: 13px;
 			cursor: pointer;
 			color: $form_option_color;
+			white-space: nowrap;
 
 			&:hover,
 			&.active
@@ -155,21 +176,21 @@
 	{
 		.input
 		{
+			color: $form_color_fill;
 			margin-bottom: 1px;
 		    margin-top: 19px;
-		}
-		label
-		{
-			font-size: 11px;
-			top: 0;
-		}
-		.input
-		{
-			color : $form_color_fill;
+
 			&:after
 			{
 				opacity: 0.7;
 			}
+		}
+
+		label
+		{
+			top: 0;
+			font-size: 11px;
+			color: $form_label_fill_color;
 		}
 
 		&.not-label
@@ -187,9 +208,36 @@
 		{
 			height: auto;
 			background-color: #fff;
-			z-index: 1;
+			z-index: 999;
 			margin-left: -1px;
 			@form_focus;
+		}
+	}
+
+	&.small
+	{
+		height: 32px;
+		line-height: 30px;
+
+		.input
+		{
+			height: 30px;
+			line-height: 30px;
+			margin: 0;
+		}
+		.select-wrap
+		{
+			top: 30px;
+		}
+		&.focus,
+		&.fill
+		{
+			.input
+			{
+				height: 30px;
+				line-height: 30px;
+				margin: 0;
+			}
 		}
 	}
 }
@@ -215,6 +263,7 @@
 					this._element.querySelector('.input').addEventListener( 'keypress', event => { if( event.keyCode === 13 ){  DOM_stopPropagation( event ) } } );
 					this._element.querySelector('.input').addEventListener( 'input', event => { event.target.previousSibling.value = event.target.textContent.replace(/\n|\t/g,' '); } );
 				}
+
 				this._element.querySelectorAll('.select-option').forEach( ( item ) => { item.addEventListener( 'click', this.select.bind(this, item) ); } );
 
 				let input_text = null;
@@ -222,10 +271,9 @@
 				{
 					input_text.addEventListener( 'keyup', this.keyup.bind( this, input_text ) );
 				}
-				this._option = option;
-				this._values = ( value ? [{ value, label : option[ value ] }] : [] );
-				this._setValue();
 
+				this._option = option;
+				this._values = [];
 				this._suggest_timeout = null;
 			}
 
@@ -234,18 +282,23 @@
 				Timers.unsetTimeout( this._input.id );
 			}
 
-			hidden( id, element )
+			hidden()
 			{
 				Timers.setTimeout( this._input.id, () =>
 		        {
-					if( this._input.value !== '' ){ this._element.classList.add('fill'); }else{ this._element.classList.remove('fill'); }
-		            this._element.classList.remove('focus');
+					this._hidden();
 		        }, 500);
+			}
+
+			_hidden()
+			{
+				if( this._input.value !== '' ){ this._element.classList.add('fill'); }else{ this._element.classList.remove('fill'); }
+				this._element.classList.remove('focus');
 			}
 
 			focus( event )
 			{
-				if( event.target.classList.contains('input-select') || event.target.classList.contains('input') )
+				if( event.target.classList.contains('input-select') || event.target.classList.contains('input') || event.target.classList.contains('label') )
 				{
 					this._element.querySelector('.select-wrap').style.maxHeight = Math.max( 150, ( document.body.getBoundingClientRect().height - this._element.querySelector('.select-wrap').getBoundingClientRect().y - 100 ) )+'px';
 					this._element.classList.add('focus');
@@ -264,7 +317,7 @@
 			select( element )
 			{
 				this._values = [];
-				if( element.classList.contains('active') )
+				if( element.classList.contains('active') && !this._element.classList.contains('selected') )
 				{
 					element.classList.remove('active');
 				}
@@ -273,10 +326,10 @@
 					this._element.querySelectorAll('.select-option').forEach( item => item.classList.remove('active') );
 
 					element.classList.add('active');
-					this._values.push({ value : element.getAttribute('data-value'), label : element.innerHTML });
+					this._values.push({ value : element.getAttribute('data-value'), label : element.innerText.trim() });
 				}
-
 				this._setValue();
+				this._hidden();
 			}
 
 			keyup( element )
@@ -289,28 +342,39 @@
 
 					this._suggest_timeout = setTimeout( () =>
 					{
-						DOM_request( 'POST', url, { query : element.value, id : 'cn=John Doe,cn=grupa,dc=xclbr-ub,dc=com' }, ( rows ) =>
+						DOM_request( 'POST', url, { query : element.value }, ( data ) =>
 						{
-							rows = JSON.parse(rows);
 							var wrapper = element.parentNode;
-								wrapper.querySelectorAll('.select-option:not(.active)').remove();
+								wrapper.querySelectorAll('.select-option,.select-group').remove();
 
-							let div = null;
-
-							for( var key in rows )
+							let div = null, sub_div = null, isSelected = false;
+							for( var key in data.option )
 							{
-								div = wrapper.querySelector('.select-option[data-value="'+key+'"]');
+								div = wrapper.querySelector('[data-value="'+key+'"]');
 								if( !div )
 								{
-									div = document.createElement('div');
-									div.className = 'select-option';
-									div.setAttribute('data-value', key );
-									div.innerHTML = rows[key];
-									div.addEventListener( 'click', this.select.bind(this, div) );
+									isSelected = ( typeof this._values.find( f => { return ( f.value === key ); } ) !== 'undefined' );
+									div = document.createElement('div'); div.className = 'select-'+( typeof data.option[key] === 'string' ? 'option' : 'group' )+( isSelected ? ' active' : '' ); div.setAttribute('data-value', key);
+									div.innerHTML = ( typeof data.option[key] === 'string' ? data.option[key] : key );
+									if( typeof data.option[key] === 'string' ){ div.addEventListener( 'click', this.select.bind(this, div) ); }
 								}
-								wrapper.insertBefore( div, element.nextSibling );
+								wrapper.appendChild( div );
+								if( typeof data.option[key] === 'object' )
+								{
+									for( var s_key in data.option[key] )
+									{
+										sub_div = wrapper.querySelector('[data-value="'+s_key+'"]');
+										if( !sub_div )
+										{
+											isSelected = ( typeof this._values.find( f => { return ( f.value === s_key ); } ) !== 'undefined' );
+											sub_div = document.createElement('div'); sub_div.className = 'select-option'+( isSelected ? ' active' : '' ); sub_div.setAttribute('data-value', s_key);
+											sub_div.innerHTML = data.option[key][s_key];
+											sub_div.addEventListener( 'click', this.select.bind(this, sub_div) );
+										}
+										wrapper.appendChild( sub_div );
+									}
+								}
 							}
-
 						} );
 					}, 300 );
 				}
@@ -327,18 +391,36 @@
 				}
 			}
 
-			_setValue()
+			_setValue( change = true )
 			{
+				let old_value = this._input.value;
 				this._element.querySelector('.input').innerHTML = ( this._values.length > 0 ? this._values[0].label : '' );
 				this._input.value = ( this._values.length > 0 ? this._values[0].value : '' );
 
 				if( this._input.value !== '' )
 				{
 					this._element.classList.add('fill');
+					this._element.querySelector('.select-option[data-value="'+this._input.value+'"]').classList.add('active');
 				}
 				else if( this._input.value === '' )
 				{
 					this._element.classList.remove('fill');
+					if( this._element.querySelector('.select-option.active') )
+					{
+						this._element.querySelector('.select-option.active').classList.remove('active');
+					}
+				}
+
+				if( this._input.onchange && old_value !== this._input.value && change )
+				{
+					this._input.onchange();
+				}
+
+				if( "createEvent" in document  && old_value !== this._input.value && change )
+				{
+					var evt = document.createEvent("HTMLEvents");
+						evt.initEvent("change", false, true);
+					this._input.dispatchEvent(evt);
 				}
 			}
 
@@ -403,19 +485,49 @@
 		}
 	}
 </script>
-<div style={'width:'+(typeof width !== 'undefined' ? width : '100%')+';'} class={'input-select'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')+(typeof disabled !== 'undefined' && disabled === 'true' ? ' disabled' : '')+(typeof label === 'undefined' ? ' not-label' : '')}>
-	<input type="hidden" value={(typeof value !== 'undefined' ? value : '')} name={(typeof id !== 'undefined' ? id : '')} id={(typeof id !== 'undefined' ? id : '')} data-join={(typeof join !== 'undefined' ? join : null )} />
-	<div class="input" contenteditable={( typeof contenteditable !== 'undefined' ? contenteditable : null )} autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+var value = ( typeof value !== 'object' ? ( value !== '' ? value.toString().split( ( typeof join !== 'undefined' ? join : ',' ) ) : [] ) : value );
+<div style={'width:'+(typeof width !== 'undefined' ? width : '100%')+';'+(typeof style !== 'undefined' ? style : '')} class={'input-select'+(typeof value !== 'undefined' && value.length > 0 ? ' fill' : '')+(typeof selected !== 'undefined' && selected === 'true' ? ' selected' : '')+(typeof clazz !== 'undefined' ? ' '+clazz : '')+(typeof disabled !== 'undefined' && disabled === 'true' ? ' disabled' : '')+(typeof label === 'undefined' ? ' not-label' : '')}>
+	<input data-filter={( typeof dataFilter !== 'undefined' ? dataFilter : null )} type="text" style="display:none;" required={(typeof required !== 'undefined' ? required : null)} pattern={(typeof pattern !== 'undefined' ? pattern : null)} onchange={(typeof onchange !== 'undefined' ? onchange : null)} value={(typeof value !== 'undefined' ? value.join( ( typeof join !== 'undefined' ? join : ',' ) ) : '')} name={(typeof id !== 'undefined' ? id : '')} id={(typeof id !== 'undefined' ? id : '')} data-join={(typeof join !== 'undefined' ? join : null )} />
+	<div class="input" placeholder={(typeof placeholder !== 'undefined' ? placeholder : null)} contenteditable={( typeof contenteditable !== 'undefined' ? contenteditable : null )} autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+		var isFirst = false;
+		for( key, item of option )
+		{
+			if( value.includes( key.toString() )  )
+			{
+				{( isFirst &&  typeof join !== 'undefined' ? join : '' ) }
+				{item.replace(/<\/?[^>]+(>|$)/g, "").trim()}
+				isFirst = true;
+			}
+			if( typeof item === 'object' )
+			{
+				for( g_key, g_item of item )
+				{
+					if( value.includes( g_key.toString() ) )
+					{
+						{ ( isFirst && typeof join !== 'undefined' ? join : '' ) }
+						{g_item.replace(/<\/?[^>]+(>|$)/g, "").trim()}
+						isFirst = true;
+					}
+				}
+			}
+		}
+	</div>
 	<div class="select-wrap">
 		if( typeof suggest !== 'undefined' && suggest )
 		{
 			<input placeholder="Search" autocomplete="off" class="input-element-text" onkeypress="return event.keyCode!=13" type="text" data-request={ ( typeof request !== 'undefined' ? encodeURIComponent( request ) : null ) }/>
 		}
 
-
 		for( key, item of option )
 		{
-			<div class={'select-option'+( typeof value !== 'undefined' && value === key ? ' active' : '' )} data-value={key}>{item}</div>
+			<div class={'select-'+( typeof item === 'string' ? 'option' : 'group' )+( value.includes( key.toString() ) ? ' active' : '' )} data-value={key}>{( typeof item === 'string' ? item : key )}</div>
+			if( typeof item === 'object' )
+			{
+				for( g_key, g_item of item )
+				{
+					<div class={'select-option'+( value.includes( g_key.toString() ) ? ' active' : '' )} data-value={g_key}>{g_item}</div>
+				}
+			}
 		}
 	</div>
 	if( typeof label !== 'undefined' )

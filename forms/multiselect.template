@@ -1,4 +1,4 @@
-<Select id={id} label={( typeof label !== 'undefined' ? label : undefined )} option={option} value={value} join={( typeof join !== 'undefined' ? join : null )} width={( typeof width !== 'undefined' ? width : undefined )} suggest={( typeof suggest !== 'undefined' ? suggest : undefined )} request={( typeof request !== 'undefined' ? request : null )} init="false"/>
+<Select id={id} label={( typeof label !== 'undefined' ? label : undefined )} required={( typeof required !== 'undefined' ? required : undefined )} pattern={( typeof pattern !== 'undefined' ? pattern : undefined )} option={option} value={value} join={( typeof join !== 'undefined' ? join : ',' )} width={( typeof width !== 'undefined' ? width : undefined )} suggest={( typeof suggest !== 'undefined' ? suggest : undefined )} request={( typeof request !== 'undefined' ? request : undefined )} init="false"/>
 <script>
 	if( typeof Multiselect === 'undefined' )
 	{
@@ -6,19 +6,13 @@
 		{
 			constructor( input, value, option )
 			{
-				super( input, value, option );
+				super( input, value, option, { value : false } );
 
 				this._values = [];
 				this._join = ( ( input.getAttribute('data-join') ? input.getAttribute('data-join') : ',' ) );
+				let value_array = ( typeof value === 'string' ? value.split( this._join ) : value );
 
-				value = value.split( this._join );
-				value.forEach( ( item ) =>
-				{
-					if( item )
-					{
-						this._values.push( { value : item, label : ( option[ item ] ? option[ item ] : item ) } );
-					}
-				} );
+				this._values =  Object.keys( option ).reduce( ( arr, item ) => { if( value_array.includes( item ) ){ arr.push( { value : item, label : option[item] } ) } if( typeof option[ item ] === 'object' ){  Object.keys( option[item] ).reduce( ( arr, sub_item ) => {  if( value_array.includes( sub_item ) ){ arr.push( { value : sub_item, label : option[item][sub_item] }  ) } return arr;  }, arr );  } return arr; }, [] );
 			}
 
 			select( element )
@@ -39,10 +33,19 @@
 				this._setValue();
 			}
 
-			_setValue()
+			_setValue( change = true )
 			{
-				this._element.querySelector('.input').innerHTML = this._values.map( ( value ) => { return value.label } ).filter( item => { return item != '' } ).join( ', ' );
-				this._input.value = this._values.map( ( value ) => { return value.value } ).join( this._join );
+				let old_value = this._input.value;
+
+				this._element.querySelector('.input').innerHTML = this._values.map( ( value ) => { return value.label } ).filter( item => { return item != '' } ).join( this._join+' ' );
+				this._input.value = this._values.map( ( value ) =>
+				{
+					if( this._element.querySelector('.select-option[data-value="'+value.value+'"]') )
+					{
+						this._element.querySelector('.select-option[data-value="'+value.value+'"]').classList.add('active');
+					}
+					return value.value;
+				} ).join( this._join );
 
 				if( this._input.value !== '' )
 				{
@@ -51,6 +54,22 @@
 				else if( this._input.value === '' )
 				{
 					this._element.classList.remove('fill');
+					if( this._element.querySelectorAll('.select-option.active').length > 0 )
+					{
+						this._element.querySelectorAll('.select-option.active').forEach( active => active.classList.remove('active') );
+					}
+				}
+
+				if( this._input.onchange && old_value !== this._input.value && change )
+				{
+					this._input.onchange();
+				}
+
+				if( "createEvent" in document  && old_value !== this._input.value && change )
+				{
+					var evt = document.createEvent("HTMLEvents");
+						evt.initEvent("change", false, true);
+					this._input.dispatchEvent(evt);
 				}
 			}
 
@@ -59,7 +78,7 @@
 				this._values = [];
 				if( value != '' )
 				{
-					value.split( ',' ).forEach( item => { this._values.push( { item, label : this._option[ item ] } ) } );
+					value.split( this._join ).forEach( item => { this._values.push( { item, label : this._option[ item ] } ) } );
 				}
 
 				this._setValue();

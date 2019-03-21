@@ -173,50 +173,62 @@
 	}
 }
 
-$overlay_background: rgba(8,9,10, 0.75);
-$dialog_shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.4);
-$dialog_color: #9da5b4;
-$dialog_radius: 6px;
-$dialog_background: #252830;
-$dialog_border: 1px solid #181a1f;
-
-$overlay_background_w: rgba(8,9,10, 0.55);
-$dialog_shadow_w: 0 6px 12px -2px rgba(0, 0, 0, 0.4);
-$dialog_color_w: #1a1a1a;
-$dialog_radius_w: 6px;
-$dialog_background_w: #fff;
-$dialog_border_w: 1px solid #ccc;
-
 .popup_dark
 {
-	--overlay_background: $overlay_background;
-	--dialog_shadow : $dialog_shadow;
-	--dialog_color : $dialog_color;
-	--dialog_radius : $dialog_radius;
-	--dialog_background : $dialog_background;
-	--dialog_border : $dialog_border;
+	--overlay_background: rgba(8,9,10, 0.75);
+	--dialog_shadow : 0 6px 12px -2px rgba(0, 0, 0, 0.4);
+	--dialog_color : #9da5b4;
+	--dialog_radius : 6px;
+	--dialog_background : #252830;
+	--dialog_border : 1px solid #181a1f;
 }
 .popup_light
 {
-	--overlay_background: $overlay_background_w;
-	--dialog_shadow : $dialog_shadow_w;
-	--dialog_color : $dialog_color_w;
-	--dialog_radius : $dialog_radius_w;
-	--dialog_background : $dialog_background_w;
-	--dialog_border : $dialog_border_w;
+	--overlay_background: rgba(8,9,10, 0.55);
+	--dialog_shadow : 0 6px 12px -2px rgba(0, 0, 0, 0.4);
+	--dialog_color : #1a1a1a;
+	--dialog_radius : 6px;
+	--dialog_background : #fff;
+	--dialog_border : 1px solid #ccc;
 }
 #popup-overlay
 {
-	position: absolute;
+	position:fixed;
 	top: 0;
 	left: 0;
 	width: 100%;
 	height: 100%;
+	background-color: var( --overlay_background );
 	text-align: center;
-	white-space: nowrap;
-	background: var( --overlay_background );
-	overflow: auto;
+	-ms-transition: background-color 300ms;
+	-webkit-transition: background-color 300ms;
+	-moz-transition: background-color 300ms;
+	transition: background-color 300ms;
 	z-index: 998;
+	overflow: auto;
+
+	&.created
+	{
+		background-color: rgba(0,0,0,0);
+		#popup
+		{
+			-ms-transform: translateY(-64px);
+			-webkit-transform: translateY(-64px);
+			-moz-transform: translateY(-64px);
+			transform: translateY(-64px); opacity: 0;
+		}
+	}
+	&.destroyed
+	{
+		background-color: rgba(0,0,0,0);
+		#popup
+		{
+			-ms-transform: translateY(64px);
+			-webkit-transform: translateY(64px);
+			-moz-transform: translateY(64px);
+			transform: translateY(64px); opacity: 0;
+		}
+	}
 
 	&:before
 	{
@@ -226,6 +238,7 @@ $dialog_border_w: 1px solid #ccc;
 		vertical-align: middle;
 		margin-right: -0.25em;
 	}
+
 	&.fullHeight
 	{
 		#popup{ height: calc( 100% - 22px);width: 1080px; padding: 0; }
@@ -234,30 +247,32 @@ $dialog_border_w: 1px solid #ccc;
 
 	#popup
 	{
-		text-align: left;
+		position:relative;
 		display: inline-block;
 		vertical-align: middle;
+		background: white;
 		padding: 20px;
 		width: 700px;
-		position: relative;
+		text-align: left;
+		white-space: normal;
+		margin: 10px;
+		opacity: 1;
+
 		box-shadow: var( --dialog_shadow );
 		color: var( --dialog_color );
 		border-radius: var( --dialog_radius );
 		background-color: var( --dialog_background );
 
+		-ms-transition: transform 600ms, opacity 300ms;
+		-webkit-transition: transform 600ms, opacity 300ms;
+		-moz-transition: transform 600ms, opacity 300ms;
+		transition: transform 600ms, opacity 300ms;
+
 		-ms-transform: translateY(0px);
-		-moz-transform: translateY(0px);
 		-webkit-transform: translateY(0px);
+		-moz-transform: translateY(0px);
 		transform: translateY(0px);
-		opacity: 1;
 
-		-ms-transition: all 600ms cubic-bezier(0.23, 1, 0.32, 1);
-		-moz-transition: all 600ms cubic-bezier(0.23, 1, 0.32, 1);
-		-webkit-transition: all 600ms cubic-bezier(0.23, 1, 0.32, 1);
-		transition: all 600ms cubic-bezier(0.23, 1, 0.32, 1);
-
-		white-space: normal;
-		margin: 10px;
 		&.popup-headers
 		{
 			padding: 0 20px 20px 20px;
@@ -274,6 +289,9 @@ $dialog_border_w: 1px solid #ccc;
 				font-size: 20px;
 				height: 24px;
 				line-height: 24px;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
 
 				.popup-close
 				{
@@ -305,32 +323,7 @@ $dialog_border_w: 1px solid #ccc;
 				}
 			}
 		}
-		&.created
-		{
-			-ms-transition: none;
-			-moz-transition: none;
-			-webkit-transition: none;
-			transition: none;
 
-			-ms-transform: translateY(-24px);
-			-moz-transform: translateY(-24px);
-			-webkit-transform: translateY(-24px);
-			transform: translateY(-24px);
-			opacity: 0;
-		}
-		&.destroyed
-		{
-			-ms-transition: all 300ms cubic-bezier(0.755, 0.05, 0.855, 0.06);
-			-moz-transition: all 300ms cubic-bezier(0.755, 0.05, 0.855, 0.06);
-			-webkit-transition: all 300ms cubic-bezier(0.755, 0.05, 0.855, 0.06);
-			transition: all 300ms cubic-bezier(0.755, 0.05, 0.855, 0.06);
-
-			-ms-transform: translateY(24px);
-			-moz-transform: translateY(24px);
-			-webkit-transform: translateY(24px);
-			transform: translateY(24px);
-			opacity: 0;
-		}
 
 		.popup-content-form
 		{
@@ -350,7 +343,6 @@ $dialog_border_w: 1px solid #ccc;
 		}
 
 	}
-
 }
 
 #dialog
@@ -581,15 +573,22 @@ var UI_Dialogs = new( function()
         showDialog( content, function(){ callback(false); } );
     }
 
-    this.popup = function( content, options )
+    this.popup = async function( content, options )
     {
+		if( typeof content === 'object' ){ options = content; content = ''; }
         options = ( typeof options != 'undefined' ? options : {} );
         if( document.getElementById('popup-overlay') ){ document.getElementById('popup-overlay').remove(); }
+
+		if( options.hasOwnProperty('url') && options.url !== '' )
+		{
+			content = await DOM_awaitRequest( 'GET', options.url, {} );
+		}
 
         var html_content = '';
         var overlay = document.createElement('div');
             overlay.id = 'popup-overlay';
-			overlay.className = ( typeof options.theme != 'undefined' && options.theme != '' ? 'popup_'+options.theme : 'popup_dark' );
+			overlay.className = 'created '+( typeof options.theme != 'undefined' && options.theme != '' ? ' popup_'+options.theme : ' popup_dark' );
+			overlay.addEventListener( 'scroll', event => { event.preventDefault && event.preventDefault(); event.stopPropagation && event.stopPropagation(); return false; });
         if( typeof options.clazz != 'undefined' && options.clazz ){ overlay.className += ' '+options.clazz; }
 
 
@@ -599,26 +598,26 @@ var UI_Dialogs = new( function()
         }
 
         html_content += content;
-        overlay.innerHTML = '<div id="popup" class="created'+( ( typeof options.header != 'undefined' && options.header != '' )?( ' popup-headers' ):( '' ) )+'" style="'+( options.hasOwnProperty('style') ? options.style : '' )+'">'+html_content+'</div>';
+        overlay.innerHTML = '<div id="popup" class="'+( ( typeof options.header != 'undefined' && options.header != '' )?( ' popup-headers' ):( '' ) )+'" style="'+( options.hasOwnProperty('style') ? options.style : '' )+'">'+html_content+'</div>';
         document.body.appendChild(overlay);
 
 		DOM_execute( overlay );
 
-        setTimeout(function(){ document.getElementById('popup').classList.remove('created'); }, 50);
+        setTimeout(function(){ document.getElementById('popup-overlay').classList.remove('created'); }, 50);
     }
 
 	this.forceClosePopup = function()
 	{
-		document.getElementById('popup').classList.remove('created');
-		document.getElementById('popup').classList.add('destroyed');
+		document.getElementById('popup-overlay').classList.remove('created');
+		document.getElementById('popup-overlay').classList.add('destroyed');
 
 		if( document.getElementById('popup-overlay') ){ document.getElementById('popup-overlay').remove(); }
 	}
 
     this.closePopup = function()
     {
-        document.getElementById('popup').classList.remove('created');
-		document.getElementById('popup').classList.add('destroyed');
+		document.getElementById('popup-overlay').classList.remove('created');
+		document.getElementById('popup-overlay').classList.add('destroyed');
 
         setTimeout(function(){ if( document.getElementById('popup-overlay') ){ document.getElementById('popup-overlay').remove(); } }, 350);
     }

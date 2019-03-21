@@ -62,7 +62,7 @@
 
 	&.focus{ @form_focus; }
 	&.fill{ @form_fill; }
-	
+
 	&.focus,
 	&.fill
 	{
@@ -73,7 +73,7 @@
 		label
 		{
 			top: 0;
-			font-size: 13px;
+			font-size: 11px;
 			color: $form_label_fill_color;
 		}
 	}

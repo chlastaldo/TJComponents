@@ -22,7 +22,7 @@ $form_option_color: #545454;
 $form_option_fill_color: #fff;
 $form_option_fill_background: #1E88E5;
 
-$form_error_background: none;
+$form_error_background: #fff7f6;
 $form_error_border: #F44336;
 
 @form_calendar_active{color: #fff; font-weight: 700; background: #C62828; border: 1px solid #C62828; margin: -1px 0 -1px -1px; }

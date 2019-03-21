@@ -141,6 +141,26 @@ console.log('blur');
 				}
 			}
 
+			_parentZIndex( element )
+			{
+				window.getComputedStyle
+				var currentElement = element;
+				var new_zindex = 0;
+
+			    while( currentElement != undefined && currentElement != null )
+			    {
+					var zindex = window.getComputedStyle( currentElement ).zIndex;
+					if( parseInt(zindex) > new_zindex ){ new_zindex = zindex; }
+			        if( currentElement.DOM_matchesSelector('body') )
+			        {
+						break;
+			        }
+			        currentElement = currentElement.parentNode;
+			    }
+
+				return new_zindex;
+			}
+
 			_getCanvas()
 			{
 				this._canvas = document.getElementById('calendar_canvas');
@@ -162,8 +182,10 @@ console.log('canvas mouseup');
 					} );
 					document.body.appendChild( this._canvas );
 				}
-
+				let zindex = this._parentZIndex( this._element );
 				let element = this._element.getBoundingClientRect();
+
+				if( zindex > 0 ){ this._canvas.style.zIndex = zindex; }
 				this._canvas.style.left = element.left+'px';
 				this._canvas.style.top = element.top + element.height+'px';
 			}
@@ -180,11 +202,13 @@ console.log('slideMonth click');
 			{
 				this._element.classList.remove('mousedown');
 console.log('select mousedown');
+				let isActiveSelf = ( day.classList.contains('active') )
+
 				let old_day = null;
 				if( ( old_day = day.parentNode.parentNode.querySelector('.day.active') ) ) { old_day.classList.remove('active'); }
-				day.classList.add('active');
-				this._input.value = date;
-				this._input.setAttribute( 'date', date );
+				if( !isActiveSelf ){ day.classList.add('active'); }
+				this._input.value = ( isActiveSelf ? '' : date );
+				this._input.setAttribute( 'date', ( isActiveSelf ? '' : date ) );
 				if( this._input.onchange ){ this._input.onchange(); }
 
 			}
@@ -271,7 +295,7 @@ console.log('select mousedown');
 	}
 </script>
 
-<div style={'width:'+(typeof width !== 'undefined' ? width : '100%')+';'} class={'input-text'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')+(typeof disabled !== 'undefined' && disabled === 'true' ? ' disabled' : '')+(typeof label === 'undefined' ? ' not-label' : '')} style={(typeof style !== 'undefined' ? style : null )}>
+<div style={'width:'+(typeof width !== 'undefined' ? width : '100%')+';'+(typeof style !== 'undefined' ? style : '')} class={'input-text'+(typeof value !== 'undefined' && value !== '' ? ' fill' : '')+(typeof clazz !== 'undefined' ? ' '+clazz : '')+(typeof disabled !== 'undefined' && disabled === 'true' ? ' disabled' : '')+(typeof label === 'undefined' ? ' not-label' : '')} style={(typeof style !== 'undefined' ? style : null )}>
 	<input onkeypress="return ( event.keyCode == 13 ? false : true );" id={id} name={id} required={(typeof required !== 'undefined' ? required : null)} pattern={(typeof pattern !== 'undefined' ? pattern : null)} placeholder={(typeof placeholder !== 'undefined' ? placeholder : '')} value={(typeof value !== 'undefined' ? value : '')} class={ typeof clazz !== 'undefined' ? 'input '+clazz : 'input' } disabled={(typeof disabled !== 'undefined' && disabled === 'true' ? 'disabled' : null )} onchange={ typeof onchange !== 'undefined' ? onchange : null } onkeydown="return false;" autocomplete="off" type="text"/>
 	if( typeof label !== 'undefined' )
 	{
