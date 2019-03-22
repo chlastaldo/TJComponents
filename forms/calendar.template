@@ -219,7 +219,8 @@ console.log('select mousedown');
 
 			_renderDay( date )
 			{
-				let today = ( date.getFullYear() == ( new Date() ).getFullYear() && date.getMonth() == ( new Date() ).getMonth() ? ( new Date() ).getDate() : null );
+				let now = new Date();
+				let today = ( date.getFullYear() == ( new Date() ).getFullYear() && date.getMonth() == ( now ).getMonth() ? ( now ).getDate() : null );
 				let monthDays = (new Date(date.getFullYear(), date.getMonth()+1, 0)).getDate(),
 					lastMonthDays = (new Date(date.getFullYear(), date.getMonth(), 0)).getDate(),
 					firstDayOfWeek = ((new Date(date.getFullYear(), date.getMonth(), 1)).getDay() + 6) % 7;
@@ -239,7 +240,18 @@ console.log('select mousedown');
 						var other_month = ( i < firstDayOfWeek || i - firstDayOfWeek + 1 > monthDays );
 						var day = ( other_month ? ( i < firstDayOfWeek ? lastMonthDays - ( ( firstDayOfWeek - 1 ) - i ) : i - firstDayOfWeek - monthDays + 1 ) : i - firstDayOfWeek + 1 );
 						var full_day = ( !other_month ? date.getFullYear()+'-'+this.__addZero( date.getMonth()+1 )+'-'+this.__addZero( day ) : '' );
-						html += '<div class="'+( other_month ? 'other_month' : 'day' )+( full_day !== '' && this._value.indexOf(full_day) === 0 ? ' active' : '' )+ ( !other_month && today == day ? ' today' : '' )+'" day="'+full_day+'">'+day+'</div>';
+						var isDirection = null;
+
+						if( this._options.direction == 'future' )
+		                {
+							isDirection = ( today && day < today && date.getMonth() <= now.getMonth() && date.getFullYear() <= now.getFullYear() ) || ( today == null && date.getMonth() < now.getMonth() && date.getFullYear() <= now.getFullYear() ) || ( date.getFullYear() < now.getFullYear() )
+		                }
+		                else if( this._options.direction == 'past' )
+		                {
+							isDirection = ( today && day > today && date.getMonth() >= now.getMonth() && date.getFullYear() >= now.getFullYear() ) || ( today == null && date.getMonth() > now.getMonth() && date.getFullYear() >= now.getFullYear() ) || ( date.getFullYear() > now.getFullYear() )
+		                }
+
+						html += '<div class="'+( other_month || isDirection ? 'other_month' : 'day' )+( full_day !== '' && this._value.indexOf(full_day) === 0 ? ' active' : '' )+ ( ( ( typeof isDirection === 'boolean' && ( !other_month || !isDirection  ) ) || (  typeof isDirection !== 'boolean' && !other_month ) ) && today == day ? ' today' : '' )+'" day="'+full_day+'">'+day+'</div>';
 
 						 ++i;
 					} )
@@ -303,6 +315,6 @@ console.log('select mousedown');
 	}
 </div>
 
-<script instance id={id} locale={typeof locale !== 'undefined' ? locale : 'en-US' } firstDay={typeof firstDay !== 'undefined' ? firstDay : 'monday' }>
-	new Calendar( document.getElementById( id ), { firstDay, locale } );
+<script instance id={id} direction={typeof direction !== 'undefined' ? direction : '' } locale={typeof locale !== 'undefined' ? locale : 'en-US' } firstDay={typeof firstDay !== 'undefined' ? firstDay : 'monday' }>
+	new Calendar( document.getElementById( id ), { firstDay, locale, direction } );
 </script>
