@@ -16,7 +16,7 @@ $form_color: #545454;
 $form_color_fill: #545454;
 
 $form_label_color: #bfbfbf;
-$form_label_fill_color: #545454;
+$form_label_fill_color: #53a7dd;
 
 $form_option_color: #545454;
 $form_option_fill_color: #fff;

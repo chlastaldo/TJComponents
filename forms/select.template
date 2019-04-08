@@ -37,6 +37,7 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		cursor: pointer;
+		font-size:13px;
 
 		&:empty:before
 		{
@@ -487,26 +488,28 @@
 </script>
 var value = ( typeof value !== 'object' ? ( value !== '' ? value.toString().split( ( typeof join !== 'undefined' ? join : ',' ) ) : [] ) : value );
 <div style={'width:'+(typeof width !== 'undefined' ? width : '100%')+';'+(typeof style !== 'undefined' ? style : '')} class={'input-select'+(typeof value !== 'undefined' && value.length > 0 ? ' fill' : '')+(typeof selected !== 'undefined' && selected === 'true' ? ' selected' : '')+(typeof clazz !== 'undefined' ? ' '+clazz : '')+(typeof disabled !== 'undefined' && disabled === 'true' ? ' disabled' : '')+(typeof label === 'undefined' ? ' not-label' : '')}>
-	<input data-filter={( typeof dataFilter !== 'undefined' ? dataFilter : null )} type="text" style="display:none;" required={(typeof required !== 'undefined' ? required : null)} pattern={(typeof pattern !== 'undefined' ? pattern : null)} onchange={(typeof onchange !== 'undefined' ? onchange : null)} value={(typeof value !== 'undefined' ? value.join( ( typeof join !== 'undefined' ? join : ',' ) ) : '')} name={(typeof id !== 'undefined' ? id : '')} id={(typeof id !== 'undefined' ? id : '')} data-join={(typeof join !== 'undefined' ? join : null )} />
 	<div class="input" placeholder={(typeof placeholder !== 'undefined' ? placeholder : null)} contenteditable={( typeof contenteditable !== 'undefined' ? contenteditable : null )} autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
 		var isFirst = false;
-		for( key, item of option )
+		if( option )
 		{
-			if( value.includes( key.toString() )  )
+			for( key, item of option )
 			{
-				{( isFirst &&  typeof join !== 'undefined' ? join : '' ) }
-				{item.replace(/<\/?[^>]+(>|$)/g, "").trim()}
-				isFirst = true;
-			}
-			if( typeof item === 'object' )
-			{
-				for( g_key, g_item of item )
+				if( value.includes( key.toString() )  )
 				{
-					if( value.includes( g_key.toString() ) )
+					{( isFirst &&  typeof join !== 'undefined' ? join : '' ) }
+					{item.replace(/<\/?[^>]+(>|$)/g, "").trim()}
+					isFirst = true;
+				}
+				if( typeof item === 'object' )
+				{
+					for( g_key, g_item of item )
 					{
-						{ ( isFirst && typeof join !== 'undefined' ? join : '' ) }
-						{g_item.replace(/<\/?[^>]+(>|$)/g, "").trim()}
-						isFirst = true;
+						if( value.includes( g_key.toString() ) )
+						{
+							{ ( isFirst && typeof join !== 'undefined' ? join : '' ) }
+							{g_item.replace(/<\/?[^>]+(>|$)/g, "").trim()}
+							isFirst = true;
+						}
 					}
 				}
 			}
@@ -517,28 +520,31 @@ var value = ( typeof value !== 'object' ? ( value !== '' ? value.toString().spli
 		{
 			<input placeholder="Search" autocomplete="off" class="input-element-text" onkeypress="return event.keyCode!=13" type="text" data-request={ ( typeof request !== 'undefined' ? encodeURIComponent( request ) : null ) }/>
 		}
-
-		for( key, item of option )
+		if( option )
 		{
-			<div class={'select-'+( typeof item === 'string' ? 'option' : 'group' )+( value.includes( key.toString() ) ? ' active' : '' )} data-value={key}>{( typeof item === 'string' ? item : key )}</div>
-			if( typeof item === 'object' )
+			for( key, item of option )
 			{
-				for( g_key, g_item of item )
+				<div class={'select-'+( typeof item === 'string' ? 'option' : 'group' )+( value.includes( key.toString() ) ? ' active' : '' )} data-value={key}>{( typeof item === 'string' ? item : key )}</div>
+				if( typeof item === 'object' )
 				{
-					<div class={'select-option'+( value.includes( g_key.toString() ) ? ' active' : '' )} data-value={g_key}>{g_item}</div>
+					for( g_key, g_item of item )
+					{
+						<div class={'select-option'+( value.includes( g_key.toString() ) ? ' active' : '' )} data-value={g_key}>{g_item}</div>
+					}
 				}
 			}
 		}
 	</div>
+	<input data-filter={( typeof dataFilter !== 'undefined' ? dataFilter : null )} type="text" style="display:none;" required={(typeof required !== 'undefined' ? required : null)} pattern={(typeof pattern !== 'undefined' ? pattern : null)} onchange={(typeof onchange !== 'undefined' ? onchange : null)} value={(typeof value !== 'undefined' ? value.join( ( typeof join !== 'undefined' ? join : ',' ) ) : '')} name={(typeof id !== 'undefined' ? id : '')} id={(typeof id !== 'undefined' ? id : '')} data-join={(typeof join !== 'undefined' ? join : null )} />
 	if( typeof label !== 'undefined' )
 	{
 		<label for={id} class="label">{label}</label>
 	}
 </div>
 
-<script instance id={id} value={value} option={option} contenteditable={( typeof contenteditable !== 'undefined' ? contenteditable : false )} init={( typeof init !== 'undefined' ? init : 'true' )}>
-	if( init === 'true' )
-	{
+if( ( typeof init !== 'undefined' && init === 'true' ) || typeof init === 'undefined' )
+{
+	<script instance id={id} value={value} option={option} contenteditable={( typeof contenteditable !== 'undefined' ? contenteditable : false )}>
 		new Select( document.getElementById( id ), value, option, {contenteditable} );
-	}
-</script>
+	</script>
+}

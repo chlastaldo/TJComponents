@@ -1,4 +1,4 @@
-<Select id={id} label={( typeof label !== 'undefined' ? label : undefined )} required={( typeof required !== 'undefined' ? required : undefined )} pattern={( typeof pattern !== 'undefined' ? pattern : undefined )} option={option} value={value} join={( typeof join !== 'undefined' ? join : ',' )} width={( typeof width !== 'undefined' ? width : undefined )} suggest={( typeof suggest !== 'undefined' ? suggest : undefined )} request={( typeof request !== 'undefined' ? request : undefined )} init="false"/>
+<Select id={id} label={( typeof label !== 'undefined' ? label : undefined )} required={( typeof required !== 'undefined' ? required : undefined )} pattern={( typeof pattern !== 'undefined' ? pattern : undefined )} option={option} value={value} join={( typeof join !== 'undefined' ? join : ',' )} width={( typeof width !== 'undefined' ? width : undefined )} suggest={( typeof suggest !== 'undefined' ? suggest : undefined )} request={( typeof request !== 'undefined' ? request : undefined )} init={false}/>
 <script>
 	if( typeof Multiselect === 'undefined' )
 	{

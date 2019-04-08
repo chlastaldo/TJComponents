@@ -81,7 +81,7 @@
 
 				Array.from( this.form.elements ).forEach( input =>
 				{
-					if( input )
+					if( input && input.name )
 					{
 						if( input.nodeName === 'INPUT' && ['checkbox', 'radio'].indexOf( input.type ) > -1 )
 						{
@@ -110,8 +110,10 @@
 
 			post( form, callback = null, submit = null )
 			{
+				let data = null;
 				if( typeof callback === 'object' ){ submit = callback; callback = null; }
 				if( typeof form === 'function' ){ callback = form; form = null; }
+				if( typeof form === 'object' ){ data = form; form = null; }
 				if( form ){ this.form = form; }
 
 				if( submit && submit.classList.contains('button_loader') ){ return null }
@@ -123,10 +125,11 @@
 				if( Object.keys( methods ).indexOf( method ) === -1 ){ console.log( 'Unsupported method '+ method ); return null; }
 
 				let checkInputs =  this.checkValidity();
+
 				if( checkInputs.length > 0 ){ this.addError( checkInputs ); return null; }
 
 				if( submit ){ submit.classList.add('button_loader'); }
-				return fetch( this.form.getAttribute('action'), { method : method, body : JSON.stringify( this.data() ), headers : new Headers({'Content-Type': methods[method], 'Cache-Control' : 'no-cache' }) } )
+				return fetch( this.form.getAttribute('action'), { method : method, body : JSON.stringify( ( data ? data : this.data() ) ), headers : new Headers({'Content-Type': methods[method], 'Cache-Control' : 'no-cache' }) } )
 					.then( ( response ) =>
 					{
 						if( response.headers.get('Content-Type').indexOf( 'application/json' ) > -1 )
